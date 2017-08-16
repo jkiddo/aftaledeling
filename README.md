@@ -21,11 +21,14 @@ Medcom har leveret danske profileringer af følgende typer (se evt. [Medcoms ove
 I forhold til aftaledeling er det dokumenter af type APD der er relevant.
 Når en aftale ønskes delt skal den derfor beskrives i et CDA dokument, der følger standarden beskrevet i (HL7 Implementation Guide for CDA Release 2.0 Appointment Document (Danish profile – DK APD) Draft for Trial Use Release 1.0)[http://svn.medcom.dk/svn/drafts/Standarder/HL7/Appointment/Dokumentation/DK-APD-v1.0.docx] med en header, der lever op til den danske profilering af CDA header.
 
-## Hvordan deles data: XDS overblik
+## Hvordan deles data: XDS overblik og services
 En XDS infrastruktur består (mindst) af følgende to komponenter:
 * XDS Repository: Står for persistering af dokumenter tilknyttet et unikt ID. 
-* XDS Registry står for opbevaring og indexering af metadata vedr. dokumenterne i et eller flere XDS repositories. Dette kunne f.eks. være start- og sluttidspunkt for en aftale, patienten, som aftalen vedrører mm (oplysningerne stammer fra CDA headeren)
+* XDS Registry: Står for opbevaring og indexering af metadata vedr. dokumenterne i et eller flere XDS repositories. Dette kunne f.eks. være start- og sluttidspunkt for en aftale, patienten, som aftalen vedrører mm (oplysningerne stammer fra CDA headeren)
 Integrationen med XDS infrastrukturen sker vha en række standardiserede SOAP webservices. Et overblik over XDS infrastrukturen og de forskellige services ses nedenfor:
 ![Billede af XDS Infrastruktur og ITI services burde være her](http://wiki.ihe.net/images/d/d7/XDS-Actor-Transaction-b.jpg "XDS komponenter og ITI services")
-Dokumenter afleveres af Document Source vha en 
 
+Når data skal deles vha XDS sker følgende:
+1. Dokumenter afleveres af dokumentkilden (Document Source) til XDS repository via servicehåndtaget *ITI-41 Provide and Register Document Set*
+2. Dokumentaftager (Document Consumer) fremsøger dokumenter i XDS registry via servicehåndtaget *ITI-18 Registry Stored Query*. Svaret på denne query er en liste af documentIds og repositoryIds, der fortæller, hvilke dokumenter der lever op til søgekriterierne, og hvor de findes (repositoryId)
+3. Dokumentaftager (Document Consumer) henter dokument i XDS repositroy via servicehåndtaget *ITI-43 Retrieve Document Set*
