@@ -2,7 +2,8 @@
 Her kan du finde information og kodeeksempler på anvendelse af XDS infrastruktur i forhold til deling af aftaler.
 Eksemplerne er skrevet i Java.
 
-Først gennemgåes de centrale koncepter i forhold til aftaledeling
+Først gennemgåes de centrale koncepter i forhold til aftaledeling dvs. de grundlæggende egenskaber ved aftaleformatet (CDA) og infrastrukturen, der anvendes til deling (XDS).
+Dernæst gennemgåes de relevante web services og der gives eksempler på anvendelse i form af (pseudo-Java)kode.
 
 ## Hvordan beskrives aftaler: CDA dokumenter og aftaledokumenter
 Data i en XDS infrastruktur gemmes som dokumenter. Et dokument har et unikt id (documentId) og en række metadata, der beskriver, hvad dokumentet handler om.
@@ -22,6 +23,7 @@ I forhold til aftaledeling er det dokumenter af type APD der er relevant.
 Når en aftale ønskes delt skal den derfor beskrives i et CDA dokument, der følger standarden beskrevet i (HL7 Implementation Guide for CDA Release 2.0 Appointment Document (Danish profile – DK APD) Draft for Trial Use Release 1.0)[http://svn.medcom.dk/svn/drafts/Standarder/HL7/Appointment/Dokumentation/DK-APD-v1.0.docx] med en header, der lever op til den danske profilering af CDA header.
 
 ## Hvordan deles data: XDS overblik og services
+XDS står for Cross-Enterprise Document Sharing og er en international standard (IHE) for udveksling af kliniske dokumenter. Se f.eks. [IHE Cross-Enterprise Document Sharing](http://wiki.ihe.net/index.php/Cross-Enterprise_Document_Sharing).
 En XDS infrastruktur består (mindst) af følgende to komponenter:
 * XDS Repository: Står for persistering af dokumenter tilknyttet et unikt ID. 
 * XDS Registry: Står for opbevaring og indexering af metadata vedr. dokumenterne i et eller flere XDS repositories. Dette kunne f.eks. være start- og sluttidspunkt for en aftale, patienten, som aftalen vedrører mm (oplysningerne stammer fra CDA headeren)
@@ -32,3 +34,31 @@ Når data skal deles vha XDS sker følgende:
 1. Dokumenter afleveres af dokumentkilden (Document Source) til XDS repository via servicehåndtaget *ITI-41 Provide and Register Document Set*
 2. Dokumentaftager (Document Consumer) fremsøger dokumenter i XDS registry via servicehåndtaget *ITI-18 Registry Stored Query*. Svaret på denne query er en liste af documentIds og repositoryIds, der fortæller, hvilke dokumenter der lever op til søgekriterierne, og hvor de findes (repositoryId)
 3. Dokumentaftager (Document Consumer) henter dokument i XDS repositroy via servicehåndtaget *ITI-43 Retrieve Document Set*
+
+## Hvordan kommer man i gang med at bruge ITI håndtagene?
+De udbudte services (ITI-XX) er standardiserede SOAP services. Fra et udvikler perspektiv kan man enten vælge selv at generere stubkode udfra de standardiserede WSDL filer eller at anvende et tredjepartsprodukt.
+Javaudviklere kan med fordel anvende (IPF Open eHealth Integration Platform)[http://oehf.github.io/ipf/ipf-platform-camel-ihe/]. Man behøver ikke at basere alting på Camel, men kan med fordel nøjes med at inkludere biblioteket (IPF Commons IHE XDS)[https://mvnrepository.com/artifact/org.openehealth.ipf.commons/ipf-commons-ihe-xds] i sin kodebase. Her findes både stubbe og en masse anvendelige utilities.
+
+Følgende eksempel på registrering af dokument vha *ITI-41 Provide and Register Document Set* baserer sig på dette bibliotek:
+´´´
+		RetrieveDocumentSetRequestType retrieveDocumentSetRequestType = new RetrieveDocumentSetRequestType();
+		RetrieveDocumentSetRequestType.DocumentRequest documentRequest = new RetrieveDocumentSetRequestType.DocumentRequest();
+		documentRequest.setRepositoryUniqueId(xdsRepositoryId);
+		documentRequest.setDocumentUniqueId(documentId);
+		retrieveDocumentSetRequestType.getDocumentRequest().add(documentRequest);
+´´´
+
+Følgende er et eksempel på fremsøgning af dokument vha *ITI-18 Registry Stored Query*:
+´´´
+´´´
+
+Følgende er et eksempel på hentning af dokument (med documentId=1) fra XDS Repository (med repositoryId=999) vha *ITI-43 Retrieve Document Set*:
+´´´
+     RetrieveDocumentSetRequestType retrieveDocumentSetRequestType = new RetrieveDocumentSetRequestType();
+     RetrieveDocumentSetRequestType.DocumentRequest documentRequest = new RetrieveDocumentSetRequestType.DocumentRequest();
+     documentRequest.setRepositoryUniqueId("999");
+     documentRequest.setDocumentUniqueId("1");
+     retrieveDocumentSetRequestType.getDocumentRequest().add(documentRequest);
+
+     RetrieveDocumentSetResponseType repositoryResponse = iti43PortType.documentRepositoryRetrieveDocumentSet(retrieveDocumentSetRequestType);
+´´´
