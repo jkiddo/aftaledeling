@@ -40,20 +40,20 @@ De udbudte services (ITI-XX) er standardiserede SOAP services. Fra et udvikler p
 Javaudviklere kan med fordel anvende (IPF Open eHealth Integration Platform)[http://oehf.github.io/ipf/ipf-platform-camel-ihe/]. Man behøver ikke at basere alting på Camel, men kan med fordel nøjes med at inkludere biblioteket (IPF Commons IHE XDS)[https://mvnrepository.com/artifact/org.openehealth.ipf.commons/ipf-commons-ihe-xds] i sin kodebase. Her findes både stubbe og en masse anvendelige utilities.
 
 Følgende eksempel på registrering af dokument vha *ITI-41 Provide and Register Document Set* baserer sig på dette bibliotek:
-´´´
+```
 		RetrieveDocumentSetRequestType retrieveDocumentSetRequestType = new RetrieveDocumentSetRequestType();
 		RetrieveDocumentSetRequestType.DocumentRequest documentRequest = new RetrieveDocumentSetRequestType.DocumentRequest();
 		documentRequest.setRepositoryUniqueId(xdsRepositoryId);
 		documentRequest.setDocumentUniqueId(documentId);
 		retrieveDocumentSetRequestType.getDocumentRequest().add(documentRequest);
-´´´
+```
 
 Følgende er et eksempel på fremsøgning af dokument vha *ITI-18 Registry Stored Query*:
-´´´
-´´´
+```
+```
 
 Følgende er et eksempel på hentning af dokument (med documentId=1) fra XDS Repository (med repositoryId=999) vha *ITI-43 Retrieve Document Set*:
-´´´
+```
      RetrieveDocumentSetRequestType retrieveDocumentSetRequestType = new RetrieveDocumentSetRequestType();
      RetrieveDocumentSetRequestType.DocumentRequest documentRequest = new RetrieveDocumentSetRequestType.DocumentRequest();
      documentRequest.setRepositoryUniqueId("999");
@@ -61,4 +61,4 @@ Følgende er et eksempel på hentning af dokument (med documentId=1) fra XDS Rep
      retrieveDocumentSetRequestType.getDocumentRequest().add(documentRequest);
 
      RetrieveDocumentSetResponseType repositoryResponse = iti43PortType.documentRepositoryRetrieveDocumentSet(retrieveDocumentSetRequestType);
-´´´
+```
