@@ -39,26 +39,69 @@ Når data skal deles vha XDS sker følgende:
 De udbudte services (ITI-XX) er standardiserede SOAP services. Fra et udvikler perspektiv kan man enten vælge selv at generere stubkode udfra de standardiserede WSDL filer eller at anvende et tredjepartsprodukt.
 Javaudviklere kan med fordel anvende (IPF Open eHealth Integration Platform)[http://oehf.github.io/ipf/ipf-platform-camel-ihe/]. Man behøver ikke at basere alting på Camel, men kan med fordel nøjes med at inkludere biblioteket (IPF Commons IHE XDS)[https://mvnrepository.com/artifact/org.openehealth.ipf.commons/ipf-commons-ihe-xds] i sin kodebase. Her findes både stubbe og en masse anvendelige utilities.
 
-Følgende eksempel på registrering af dokument vha *ITI-41 Provide and Register Document Set* baserer sig på dette bibliotek:
+Følgende eksempel på registrering af dokument (med documentId=1 for en patient med CPR-nummer 2512489996 for en afdeling med SOR kode 12345678) vha *ITI-41 Provide and Register Document Set* baserer sig på dette bibliotek:
 ```
-		RetrieveDocumentSetRequestType retrieveDocumentSetRequestType = new RetrieveDocumentSetRequestType();
-		RetrieveDocumentSetRequestType.DocumentRequest documentRequest = new RetrieveDocumentSetRequestType.DocumentRequest();
-		documentRequest.setRepositoryUniqueId(xdsRepositoryId);
-		documentRequest.setDocumentUniqueId(documentId);
-		retrieveDocumentSetRequestType.getDocumentRequest().add(documentRequest);
+ProvideAndRegisterDocumentSet provideAndRegisterDocumentSet = new ProvideAndRegisterDocumentSet();
+
+AssigningAuthority patientIdAssigningAuthority = new AssigningAuthority("1.2.208.176.1.2"); // OID for CPR registret
+Identifiable patientIdentifiable = patientIdentifiable = new Identifiable("2512489996", patientIdAssigningAuthority);
+
+AssigningAuthority organisationAssigningAuthority = new AssigningAuthority("1.2.208.176.1"); // OID for SOR
+Author author = new Author();
+Organization authorOrganisation = new Organization("Afdelingen for xyz", "123456789", organisationAssigningAuthority);
+author.getAuthorInstitution().add(authorOrganisation);
+
+SubmissionSet submissionSet = new SubmissionSet();
+submissionSet.setPatientId(patientIdentifiable);
+submissionSet.setAuthor(author);
+submissionSet.setAvailabilityStatus(AvailabilityStatus.APPROVED);
+
+
+DocumentEntry documentEntry = new DocumentEntry();
+documentEntry.setPatientId(patientIdentifiable);
+
+... mere metadata (se profil)
+
+Document document = new Document(documentEntry, new DataHandler(new ByteArrayDataSource(documentPayload.getBytes(), "text/xml")));
+provideAndRegisterDocumentSet.getDocuments().add(document);
+        
+ProvideAndRegisterDocumentSetTransformer registerDocumentSetTransformer = new ProvideAndRegisterDocumentSetTransformer(getEbXmlFactory());
+EbXMLProvideAndRegisterDocumentSetRequest30 ebxmlRequest = (EbXMLProvideAndRegisterDocumentSetRequest30) registerDocumentSetTransformer.toEbXML(provideAndRegisterDocumentSet);
+ProvideAndRegisterDocumentSetRequestType provideAndRegisterDocumentSetRequestType = ebxmlRequest.getInternal();
+ProvideAndRegisterDocumentSetRequest provideAndRegisterDocumentSetRequest = new ProvideAndRegisterDocumentSetRequest("1", provideAndRegisterDocumentSetRequestType);
+
+RegistryResponseType registryResponse = iti41PortType.documentRepositoryProvideAndRegisterDocumentSetB(provideAndRegisterDocumentSetRequest.getProvideAndRegisterDocumentSetRequestType());
 ```
 
-Følgende er et eksempel på fremsøgning af dokument vha *ITI-18 Registry Stored Query*:
+Følgende er et eksempel på fremsøgning af (godkendte) dokumenter for patient (med CPR nummer 2512489996)  vha *ITI-18 Registry Stored Query*:
 ```
+FindDocumentsQuery fdq = new FindDocumentsQuery();
+AssigningAuthority authority = new AssigningAuthority("1.2.208.176.1.2");
+Identifiable patientIdentifiable = new Identifiable("2512489996", authority);
+fdq.setPatientId(patientIdentifiable);	
+List<AvailabilityStatus> availabilityStati = new LinkedList<>();
+availabilityStati.add(AvailabilityStatus.APPROVED);
+fdq.setStatus(availabilityStati);
+
+QueryRegistry queryRegistry = new QueryRegistry(fdq);
+QueryReturnType qrt = QueryReturnType.LEAF_CLASS;
+if (qrt != null) {
+	queryRegistry.setReturnType(qrt);
+}
+
+QueryRegistryTransformer queryRegistryTransformer = new QueryRegistryTransformer();
+EbXMLAdhocQueryRequest ebxmlAdhocQueryRequest = queryRegistryTransformer.toEbXML(queryRegistry);
+AdhocQueryRequest internal = (AdhocQueryRequest)ebxmlAdhocQueryRequest.getInternal();
+AdhocQueryResponse adhocQueryResponse = iti18PortType.documentRegistryRegistryStoredQuery(adhocQueryRequest);
 ```
 
 Følgende er et eksempel på hentning af dokument (med documentId=1) fra XDS Repository (med repositoryId=999) vha *ITI-43 Retrieve Document Set*:
 ```
-     RetrieveDocumentSetRequestType retrieveDocumentSetRequestType = new RetrieveDocumentSetRequestType();
-     RetrieveDocumentSetRequestType.DocumentRequest documentRequest = new RetrieveDocumentSetRequestType.DocumentRequest();
-     documentRequest.setRepositoryUniqueId("999");
-     documentRequest.setDocumentUniqueId("1");
-     retrieveDocumentSetRequestType.getDocumentRequest().add(documentRequest);
+RetrieveDocumentSetRequestType retrieveDocumentSetRequestType = new RetrieveDocumentSetRequestType();
+RetrieveDocumentSetRequestType.DocumentRequest documentRequest = new RetrieveDocumentSetRequestType.DocumentRequest();
+documentRequest.setRepositoryUniqueId("999");
+documentRequest.setDocumentUniqueId("1");
+retrieveDocumentSetRequestType.getDocumentRequest().add(documentRequest);
 
-     RetrieveDocumentSetResponseType repositoryResponse = iti43PortType.documentRepositoryRetrieveDocumentSet(retrieveDocumentSetRequestType);
+RetrieveDocumentSetResponseType repositoryResponse = iti43PortType.documentRepositoryRetrieveDocumentSet(retrieveDocumentSetRequestType);
 ```
