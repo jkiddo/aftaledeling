@@ -14,6 +14,9 @@ public class DocumentMetadata extends CdaMetadata {
 	@JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZ")
 	public Date reportTime;
 	
+	@JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZ")
+	public Date serviceStartTime;	
+	
 	public Code organisation;
 
 	public Code typeCode;
@@ -110,6 +113,14 @@ public class DocumentMetadata extends CdaMetadata {
 
 	public void setConfidentialityCode(Code confidentialityCode) {
 		this.confidentialityCode = confidentialityCode;
+	}
+	
+	public Date getServiceStartTime() {
+		return serviceStartTime;
+	}
+
+	public void setServiceStartTime(Date serviceStartTime) {
+		this.serviceStartTime = serviceStartTime;
 	}
 
 }

@@ -58,16 +58,12 @@ public class Application implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 
 		// Fremsøg aftaler for patienten
-		List<DocumentEntry> currentAppointments = appointmentXdsRequestService.getAppointmentsForPatient(PATIENT_ID);
+		List<DocumentEntry> currentAppointments = appointmentXdsRequestService.getAllAppointmentsForPatient(PATIENT_ID);
 		System.out.println("The patient with id="+PATIENT_ID+" has "+currentAppointments.size()+" registered in the XDS registry.");
 
 		// Register appointment
-		//		String appointmentXmlDocument = getXmlFileContent("/DK-APD_Example_1.xml");
-		String appointmentXmlDocument = getXmlFileContent("/PHMR_KOL_Example_4_MaTIS.xml");
+		String appointmentXmlDocument = getXmlFileContent("/DK-APD_Example_1.xml");
 		DocumentMetadata appointmentCdaMetadata = new DocumentMetadata();
-		//appointmentCdaMetadata.setClassCode(new Code("Aftale", "001", "2.16.840.1.113883.5.6"));
-		//appointmentCdaMetadata.setHealthcareFacilityTypeCode(new Code("hospital", "22232009", "2.16.840.1.113883.6.96"));
-		//appointmentCdaMetadata.setPracticeSettingCode(new Code("børne- og ungdomspsykiatri", "394588006", "2.16.840.1.113883.6.96"));
 
 		appointmentCdaMetadata.setPatientId(new Code(PATIENT_ID, null, Codes.DK_CPR_OID));
 		appointmentCdaMetadata.setReportTime(new SimpleDateFormat("yyyyMMddHHmmssZ").parse("20170531110000+0100"));
@@ -79,12 +75,14 @@ public class Application implements CommandLineRunner {
 		appointmentCdaMetadata.setSubmissionTime(new Date());
 		appointmentCdaMetadata.setTypeCode(new Code("39289-4", new LocalizedString("Dato og tidspunkt for møde mellem patient og sundhedsperson"), "2.16.840.1.113883.6.1"));
 
+		appointmentCdaMetadata.setServiceStartTime(new Date());
+		
 		String externalId = generateUUID();
 		String documentId = appointmentXdsRequestService.createAndRegisterDocument(externalId, appointmentXmlDocument, appointmentCdaMetadata);
 		System.out.println("We registered a new appointment with documentId="+documentId);
 
 		// Fremsøg aftaler for patienten
-		List<DocumentEntry> currentAppointmentsAfterNewAppointment = appointmentXdsRequestService.getAppointmentsForPatient(PATIENT_ID);
+		List<DocumentEntry> currentAppointmentsAfterNewAppointment = appointmentXdsRequestService.getAllAppointmentsForPatient(PATIENT_ID);
 		System.out.println("The patient with id="+PATIENT_ID+" now has "+currentAppointmentsAfterNewAppointment.size()+" registered in the XDS registry.");
 
 /*		FetchDocumentRequest fetchDocumentRequest = new FetchDocumentRequest();

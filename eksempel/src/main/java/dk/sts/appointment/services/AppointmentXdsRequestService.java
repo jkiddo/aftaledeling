@@ -3,6 +3,8 @@ package dk.sts.appointment.services;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,7 +19,9 @@ import org.openehealth.ipf.commons.ihe.xds.core.ebxml.ebxml30.ProvideAndRegister
 import org.openehealth.ipf.commons.ihe.xds.core.ebxml.ebxml30.RetrieveDocumentSetResponseType;
 import org.openehealth.ipf.commons.ihe.xds.core.ebxml.ebxml30.RetrieveDocumentSetResponseType.DocumentResponse;
 import org.openehealth.ipf.commons.ihe.xds.core.metadata.AvailabilityStatus;
+import org.openehealth.ipf.commons.ihe.xds.core.metadata.Code;
 import org.openehealth.ipf.commons.ihe.xds.core.metadata.DocumentEntry;
+import org.openehealth.ipf.commons.ihe.xds.core.metadata.LocalizedString;
 import org.openehealth.ipf.commons.ihe.xds.core.responses.QueryResponse;
 import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.lcm.SubmitObjectsRequest;
 import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.query.AdhocQueryRequest;
@@ -56,8 +60,14 @@ public class AppointmentXdsRequestService {
 	@Autowired
 	Iti41PortType iti41PortType;
 
-	public List<DocumentEntry> getAppointmentsForPatient(String citizenId) throws XdsException {
-		AdhocQueryRequest adhocQueryRequest = appointmentXdsRequestBuilderService.buildAdhocQueryRequest(citizenId, null);
+	public List<DocumentEntry> getAllAppointmentsForPatient(String citizenId) throws XdsException {
+		return getAppointmentsForPatient(citizenId, null, null);
+	}
+	
+	public List<DocumentEntry> getAppointmentsForPatient(String citizenId, Date start, Date end) throws XdsException {
+		List<Code> typeCodes = new ArrayList<Code>();
+		typeCodes.add(new Code("39289-4", new LocalizedString("Dato og tidspunkt for møde mellem patient og sundhedsperson"), "2.16.840.1.113883.6.1"));
+		AdhocQueryRequest adhocQueryRequest = appointmentXdsRequestBuilderService.buildAdhocQueryRequest(citizenId, typeCodes, start, end);
 		LOGGER.info("before xds call: documentRegistryRegistryStoredQuery");
 		AdhocQueryResponse adhocQueryResponse = iti18PortType.documentRegistryRegistryStoredQuery(adhocQueryRequest);
 		LOGGER.info("after xds call: documentRegistryRegistryStoredQuery");
@@ -71,6 +81,7 @@ public class AppointmentXdsRequestService {
 			return docEntries;
 		}
 	}
+	
 
 	public String fetchDocument(String documentId) throws IOException, XdsException {
 		List<String> documentIds = new LinkedList<String>();

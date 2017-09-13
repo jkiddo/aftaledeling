@@ -3,6 +3,7 @@ package dk.sts.appointment.services;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,9 +36,7 @@ import org.openehealth.ipf.commons.ihe.xds.core.metadata.XpnName;
 import org.openehealth.ipf.commons.ihe.xds.core.requests.ProvideAndRegisterDocumentSet;
 import org.openehealth.ipf.commons.ihe.xds.core.requests.QueryRegistry;
 import org.openehealth.ipf.commons.ihe.xds.core.requests.query.FindDocumentsQuery;
-import org.openehealth.ipf.commons.ihe.xds.core.requests.query.QueryList;
 import org.openehealth.ipf.commons.ihe.xds.core.requests.query.QueryReturnType;
-import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.lcm.SubmitObjectsRequest;
 import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.query.AdhocQueryRequest;
 import org.openehealth.ipf.commons.ihe.xds.core.transform.requests.ProvideAndRegisterDocumentSetTransformer;
 import org.openehealth.ipf.commons.ihe.xds.core.transform.requests.QueryRegistryTransformer;
@@ -57,12 +56,6 @@ public class AppointmentXdsRequestBuilderService {
 	
 	@Autowired
 	PatientIdAuthority patientIdAuthority;
-	
-	public SubmitObjectsRequest buildSubmitObjectsRequest(String document, DocumentMetadata documentMetadata) {
-		SubmitObjectsRequest submitObjectsRequest = new SubmitObjectsRequest();
-		// TODO Auto-generated method stub
-		return submitObjectsRequest;
-	}
 	
 	public ProvideAndRegisterDocumentSetRequestType buildProvideAndRegisterDocumentSetRequest(String extenalDocumentId, String documentPayload, DocumentMetadata documentMetadata) {
 
@@ -95,6 +88,7 @@ public class AppointmentXdsRequestBuilderService {
 		String documentUuid = generateUUID();
 		
 		DocumentEntry documentEntry = new DocumentEntry();
+		
 		// 4.1 Patient Identification
 		documentEntry.setPatientId(patientIdentifiable);
 		documentEntry.setSourcePatientId(patientIdentifiable);
@@ -105,7 +99,7 @@ public class AppointmentXdsRequestBuilderService {
 
 		// 4.2.1 Name
 		Name<?> name = new XpnName();
-		// TODO
+		
 		sourcePatientInfo.setName(name);
 		documentEntry.setEntryUuid(generateUUID());
 		documentEntry.setAuthor(author);
@@ -117,6 +111,9 @@ public class AppointmentXdsRequestBuilderService {
 			documentEntry.getConfidentialityCodes().add(documentMetadata.getConfidentialityCode());
 		}
 		documentEntry.setCreationTime(dateTimeFormat.format(documentMetadata.getReportTime()));
+		
+		documentEntry.setServiceStartTime(dateTimeFormat.format(documentMetadata.getServiceStartTime()));
+		
 		List<Code> eventCodesEntry = documentEntry.getEventCodeList();
 		if (documentMetadata.getEventCodes() != null) {
 			for (Code eventCode : documentMetadata.getEventCodes()) {
@@ -183,12 +180,13 @@ public class AppointmentXdsRequestBuilderService {
 		return retrieveDocumentSetRequestType;
 	}
 
-	public AdhocQueryRequest buildAdhocQueryRequest(String citizenId, List<Code> codes) {
-		return buildAdhocQueryRequest(citizenId, codes, AvailabilityStatus.APPROVED);
+	public AdhocQueryRequest buildAdhocQueryRequest(String citizenId, List<Code> typeCodes, Date start, Date end) {
+		return buildAdhocQueryRequest(citizenId, typeCodes, AvailabilityStatus.APPROVED, start, end);
 	}
 	
-	public AdhocQueryRequest buildAdhocQueryRequest(String citizenId, List<Code> codes, AvailabilityStatus availabilityStatus) {
+	public AdhocQueryRequest buildAdhocQueryRequest(String citizenId, List<Code> typeCodes, AvailabilityStatus availabilityStatus, Date start, Date end) {
 		FindDocumentsQuery fdq = new FindDocumentsQuery();
+		DateFormat dateTimeFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 		AssigningAuthority authority = new AssigningAuthority(patientIdAuthority.getPatientIdAuthority());
 
 		// Patient ID
@@ -200,17 +198,26 @@ public class AppointmentXdsRequestBuilderService {
 		availabilityStati.add(availabilityStatus);
 		fdq.setStatus(availabilityStati);
 
-		if (codes != null) {
-			QueryList<Code> eventCodes = new QueryList<Code>();
-			eventCodes.getOuterList().add(codes);
-			fdq.setEventCodes(eventCodes);
+		if (typeCodes != null) {
+			fdq.setTypeCodes(typeCodes);
 		}
+		
+		if (start != null) {
+			fdq.getServiceStartTime().setFrom(dateTimeFormat.format(start));
+		}
+		
+		if (end != null) {
+			fdq.getServiceStartTime().setTo(dateTimeFormat.format(end));
+		}
+		
 
 		QueryRegistry queryRegistry = new QueryRegistry(fdq);
 		QueryReturnType qrt = QueryReturnType.LEAF_CLASS;
+		
 		if (qrt != null) {
 			queryRegistry.setReturnType(qrt);
 		}
+		
 		QueryRegistryTransformer queryRegistryTransformer = new QueryRegistryTransformer();
 		EbXMLAdhocQueryRequest ebxmlAdhocQueryRequest = queryRegistryTransformer.toEbXML(queryRegistry);
 		AdhocQueryRequest internal = (AdhocQueryRequest)ebxmlAdhocQueryRequest.getInternal();
