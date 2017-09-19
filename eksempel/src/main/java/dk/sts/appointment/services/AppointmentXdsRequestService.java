@@ -78,6 +78,25 @@ public class AppointmentXdsRequestService {
 		}
 	}
 	
+	public DocumentEntry getAppointment(String documentId) throws XdsException {
+
+		AdhocQueryRequest adhocQueryRequest = appointmentXdsRequestBuilderService.buildAdhocQueryRequest(documentId);
+		
+		AdhocQueryResponse adhocQueryResponse = iti18PortType.documentRegistryRegistryStoredQuery(adhocQueryRequest);
+
+		
+		if (adhocQueryResponse.getRegistryErrorList() != null && !adhocQueryResponse.getRegistryErrorList().getRegistryError().isEmpty()) {
+			throw new XdsException(adhocQueryResponse.getRegistryErrorList());
+		} else {
+			QueryResponseTransformer queryResponseTransformer = new QueryResponseTransformer(getEbXmlFactory());
+			EbXMLQueryResponse30 ebXmlresponse = new EbXMLQueryResponse30(adhocQueryResponse);
+			QueryResponse queryResponse = queryResponseTransformer.fromEbXML(ebXmlresponse);
+			List<DocumentEntry> docEntries = queryResponse.getDocumentEntries();
+			return docEntries.get(0);
+		}
+	}
+	
+	
 
 	public String fetchDocument(String documentId) throws IOException, XdsException {
 		List<String> documentIds = new LinkedList<String>();

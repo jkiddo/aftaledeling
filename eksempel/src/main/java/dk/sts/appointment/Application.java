@@ -88,11 +88,14 @@ public class Application implements CommandLineRunner {
 		//Hent aftale
 		String document = appointmentXdsRequestService.fetchDocument(documentId);
 		System.out.println(document);
-
-		DocumentEntry toBeDeprecated = currentAppointmentsAfterNewAppointment.get(0);
+		
+		//Hent det dokument som der skal deprecates
+		DocumentEntry toBeDeprecated = appointmentXdsRequestService.getAppointment(documentId);		
 		
 		appointmentXdsRequestService.deprecateDocument(toBeDeprecated.getPatientId().getId(), toBeDeprecated.getEntryUuid(), toBeDeprecated.getRepositoryUniqueId(), toBeDeprecated.getAvailabilityStatus().getQueryOpcode());
 
+		//DocumentEntry afterDeprecation = appointmentXdsRequestService.getAppointment(documentId);	
+		
 		//Fremsøg aftaler for patienten
 		List<DocumentEntry> currentAppointmentsAfterDeprecation = appointmentXdsRequestService.getAllAppointmentsForPatient(PATIENT_ID);
 		System.out.println("The patient with id="+PATIENT_ID+" now has "+currentAppointmentsAfterDeprecation.size()+" registered in the XDS registry.");

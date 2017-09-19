@@ -36,6 +36,8 @@ import org.openehealth.ipf.commons.ihe.xds.core.metadata.XpnName;
 import org.openehealth.ipf.commons.ihe.xds.core.requests.ProvideAndRegisterDocumentSet;
 import org.openehealth.ipf.commons.ihe.xds.core.requests.QueryRegistry;
 import org.openehealth.ipf.commons.ihe.xds.core.requests.query.FindDocumentsQuery;
+import org.openehealth.ipf.commons.ihe.xds.core.requests.query.GetDocumentsAndAssociationsQuery;
+import org.openehealth.ipf.commons.ihe.xds.core.requests.query.Query;
 import org.openehealth.ipf.commons.ihe.xds.core.requests.query.QueryReturnType;
 import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.lcm.SubmitObjectsRequest;
 import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.query.AdhocQueryRequest;
@@ -235,6 +237,27 @@ public class AppointmentXdsRequestBuilderService {
 
 		return internal;
 	}
+	
+	public AdhocQueryRequest buildAdhocQueryRequest(String documentId) {
+		GetDocumentsAndAssociationsQuery getQuery = new GetDocumentsAndAssociationsQuery();
+		List<String> uniqueIds = new LinkedList<String>();
+		uniqueIds.add(documentId);
+		getQuery.setUniqueIds(uniqueIds);
+		return createAdhocQueryRequest(getQuery, QueryReturnType.LEAF_CLASS);
+	}
+	
+	private AdhocQueryRequest createAdhocQueryRequest(Query query, QueryReturnType qrt) {
+		QueryRegistry queryRegistry = new QueryRegistry(query);
+		if (qrt != null) {
+			queryRegistry.setReturnType(qrt);
+		}
+		QueryRegistryTransformer queryRegistryTransformer = new QueryRegistryTransformer();
+		EbXMLAdhocQueryRequest ebxmlAdhocQueryRequest = queryRegistryTransformer.toEbXML(queryRegistry);
+		AdhocQueryRequest internal = (AdhocQueryRequest)ebxmlAdhocQueryRequest.getInternal();
+
+		return internal;
+	}
+	
 
 	protected SubmissionSet createSubmissionSet(Author author, Identifiable patientIdentifiable) {
 		String submissionSetUuid = generateUUID();
@@ -349,6 +372,5 @@ public class AppointmentXdsRequestBuilderService {
 		externalIdentifier.setRegistryObject("SubmissionSet");
 		return externalIdentifier;
 	}
-
 	
 }
