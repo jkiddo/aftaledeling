@@ -85,21 +85,17 @@ public class Application implements CommandLineRunner {
 		List<DocumentEntry> currentAppointmentsAfterNewAppointment = appointmentXdsRequestService.getAllAppointmentsForPatient(PATIENT_ID);
 		System.out.println("The patient with id="+PATIENT_ID+" now has "+currentAppointmentsAfterNewAppointment.size()+" registered in the XDS registry.");
 
-/*		FetchDocumentRequest fetchDocumentRequest = new FetchDocumentRequest();
-		fetchDocumentRequest.setDocumentId(documentId);
-		app
-		String document = appointmentXdsRequestService.fetchDocument(fetchDocumentRequest);
+		//Hent aftale
+		String document = appointmentXdsRequestService.fetchDocument(documentId);
 		System.out.println(document);
-	*/	
-		// Hov...det var det forkerte sted og på det forkerte tidspunkt..vi opdaterer
-		//		String updatedAppointmentXmlDocument = getXmlFileContent("/DK-APD_Example_1_newTimeAndPlace.xml");
-		//	appointmentXdsRequestService.updateCda(documentId, updatedAppointmentXmlDocument, appointmentCdaMetadata);
 
-		//appointmentXdsRequestService.deprecateCda(documentId);
+		DocumentEntry toBeDeprecated = currentAppointmentsAfterNewAppointment.get(0);
+		
+		appointmentXdsRequestService.deprecateDocument(toBeDeprecated.getPatientId().getId(), toBeDeprecated.getEntryUuid(), toBeDeprecated.getRepositoryUniqueId(), toBeDeprecated.getAvailabilityStatus().getQueryOpcode());
 
-		// Fremsøg aftaler for patienten
-//		List<DocumentEntry> currentAppointmentsAfterUpdateOfAppointment = appointmentXdsRequestService.getAppointmentsForPatient(PATIENT_ID);
-	//	System.out.println("The patient with id="+PATIENT_ID+" now has "+currentAppointmentsAfterUpdateOfAppointment.size()+" registered in the XDS registry.");
+		//Fremsøg aftaler for patienten
+		List<DocumentEntry> currentAppointmentsAfterDeprecation = appointmentXdsRequestService.getAllAppointmentsForPatient(PATIENT_ID);
+		System.out.println("The patient with id="+PATIENT_ID+" now has "+currentAppointmentsAfterDeprecation.size()+" registered in the XDS registry.");
 
 	}
 

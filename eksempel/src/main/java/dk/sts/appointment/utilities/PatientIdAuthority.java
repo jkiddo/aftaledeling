@@ -10,7 +10,7 @@ public class PatientIdAuthority {
 		this.patientIdAuthority = patientIdAuthority;
 	}
 	
-	protected String formatPatientIdentifier(String patientIdentifier) {
+	public String formatPatientIdentifier(String patientIdentifier) {
 		return String.format(PATIENT_ID_PATTERN, patientIdentifier, patientIdAuthority);
 	}
 

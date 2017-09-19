@@ -37,7 +37,18 @@ import org.openehealth.ipf.commons.ihe.xds.core.requests.ProvideAndRegisterDocum
 import org.openehealth.ipf.commons.ihe.xds.core.requests.QueryRegistry;
 import org.openehealth.ipf.commons.ihe.xds.core.requests.query.FindDocumentsQuery;
 import org.openehealth.ipf.commons.ihe.xds.core.requests.query.QueryReturnType;
+import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.lcm.SubmitObjectsRequest;
 import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.query.AdhocQueryRequest;
+import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.rim.AssociationType1;
+import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.rim.ClassificationType;
+import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.rim.ExternalIdentifierType;
+import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.rim.InternationalStringType;
+import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.rim.LocalizedStringType;
+import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.rim.ObjectFactory;
+import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.rim.RegistryObjectListType;
+import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.rim.RegistryPackageType;
+import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.rim.SlotType1;
+import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.rim.ValueListType;
 import org.openehealth.ipf.commons.ihe.xds.core.transform.requests.ProvideAndRegisterDocumentSetTransformer;
 import org.openehealth.ipf.commons.ihe.xds.core.transform.requests.QueryRegistryTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -251,4 +262,93 @@ public class AppointmentXdsRequestBuilderService {
 		java.util.UUID uuid = java.util.UUID.randomUUID();
 		return Math.abs(uuid.getLeastSignificantBits()) + "." + Math.abs(uuid.getMostSignificantBits())+"."+Calendar.getInstance().getTimeInMillis();
 	}
+
+
+	public SubmitObjectsRequest buildDeprecateSubmitObjectsRequest(String cpr, String documentEntryUUID, String repositoryId, String originalStatus) {
+		
+		ObjectFactory factory = new ObjectFactory();
+		
+		SubmitObjectsRequest body = new SubmitObjectsRequest();
+		
+		RegistryObjectListType registryObjectList = factory.createRegistryObjectListType();
+		registryObjectList.getIdentifiable().add(factory.createRegistryPackage(makeRegistryPackageType(cpr,repositoryId,documentEntryUUID,"NscContentType","CodingScheme")));
+		registryObjectList.getIdentifiable().add(factory.createAssociation(makeAssociation(documentEntryUUID, originalStatus, AvailabilityStatus.DEPRECATED.getQueryOpcode())));
+		
+		body.setRegistryObjectList(registryObjectList);
+		
+		return body;
+	}
+	
+	private AssociationType1 makeAssociation(String documentEntryUUID, String originalStatus, String newStatus) {
+		AssociationType1 assocation = new AssociationType1();
+		
+		assocation.setAssociationType(AssociationType.UPDATE_AVAILABILITY_STATUS.getOpcode30());
+		assocation.setSourceObject("SubmissionSet");
+		assocation.setTargetObject(documentEntryUUID);
+		assocation.getSlot().add(makeSlot("OriginalStatus", originalStatus));
+		assocation.getSlot().add(makeSlot("NewStatus", newStatus));
+		
+		return assocation;
+		
+	}
+	
+	private RegistryPackageType makeRegistryPackageType(String cpr, String sourceId, String uniqueId, String contentType, String contentTypeCodingScheme) {
+		RegistryPackageType registryPackage = new RegistryPackageType();
+		
+		DateFormat dateTimeFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+		
+		ClassificationType classificationNode = new ClassificationType();
+		classificationNode.setClassifiedObject("SubmissionSet");
+		classificationNode.setClassificationNode(UUID.XDSSubmissionSet_classificationNode);
+		
+		ClassificationType contentTypeClassification = new ClassificationType();
+		contentTypeClassification.setClassifiedObject("SubmissionSet");
+		contentTypeClassification.setClassificationScheme(UUID.XDSSubmissionSet_contentTypeCode);		
+		contentTypeClassification.setObjectType("urn:oasis:names:tc:ebxml-regrep:ObjectType:RegistryObject:Classification");
+		contentTypeClassification.setNodeRepresentation(contentType);
+		contentTypeClassification.setName(makeInternationalStringType(contentType));		
+		contentTypeClassification.getSlot().add(makeSlot("codingScheme", contentTypeCodingScheme));
+		
+		registryPackage.setId("SubmissionSet");
+		registryPackage.setObjectType("urn:oasis:names:tc:ebxml-regrep:ObjectType:RegistryObject:RegistryPackage");
+		
+		registryPackage.getExternalIdentifier().add(makeExternalIdentifier(UUID.XDSSubmissionSet_uniqueId, uniqueId));
+		registryPackage.getExternalIdentifier().add(makeExternalIdentifier(UUID.XDSSubmissionSet_patientId, patientIdAuthority.formatPatientIdentifier(cpr)));
+		registryPackage.getExternalIdentifier().add(makeExternalIdentifier(UUID.XDSSubmissionSet_sourceId, sourceId));
+		
+		registryPackage.getClassification().add(classificationNode);
+		registryPackage.getClassification().add(contentTypeClassification);
+		
+		registryPackage.getSlot().add(makeSlot("submissionTime", dateTimeFormat.format(new Date())));
+		
+		return registryPackage;
+	}
+	
+	private SlotType1 makeSlot(String name, String value) {
+		SlotType1 slot = new SlotType1();
+		ValueListType slotList = new ValueListType();		
+		slot.setName(name);
+		slotList.getValue().add(value);
+		slot.setValueList(slotList);		
+		return slot;	
+	}
+	
+	private InternationalStringType makeInternationalStringType(String value) {
+		InternationalStringType ist = new InternationalStringType();
+		LocalizedStringType lst = new LocalizedStringType();		
+		lst.setValue(value);
+		ist.getLocalizedString().add(lst);
+		return ist;
+	}
+	
+	private ExternalIdentifierType makeExternalIdentifier(String identificationScheme, String value) {
+		ExternalIdentifierType externalIdentifier = new ExternalIdentifierType();
+		externalIdentifier.setObjectType("urn:oasis:names:tc:ebxml-regrep:ObjectType:RegistryObject:ExternalIdentifier");
+		externalIdentifier.setIdentificationScheme(identificationScheme);
+		externalIdentifier.setValue(value);
+		externalIdentifier.setRegistryObject("SubmissionSet");
+		return externalIdentifier;
+	}
+
+	
 }

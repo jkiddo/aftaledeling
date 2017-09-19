@@ -9,16 +9,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.openehealth.ipf.commons.ihe.xds.core.ebxml.EbXMLExtrinsicObject;
 import org.openehealth.ipf.commons.ihe.xds.core.ebxml.EbXMLFactory;
-import org.openehealth.ipf.commons.ihe.xds.core.ebxml.EbXMLObjectLibrary;
-import org.openehealth.ipf.commons.ihe.xds.core.ebxml.EbXMLSubmitObjectsRequest;
 import org.openehealth.ipf.commons.ihe.xds.core.ebxml.ebxml30.EbXMLFactory30;
 import org.openehealth.ipf.commons.ihe.xds.core.ebxml.ebxml30.EbXMLQueryResponse30;
 import org.openehealth.ipf.commons.ihe.xds.core.ebxml.ebxml30.ProvideAndRegisterDocumentSetRequestType;
 import org.openehealth.ipf.commons.ihe.xds.core.ebxml.ebxml30.RetrieveDocumentSetResponseType;
 import org.openehealth.ipf.commons.ihe.xds.core.ebxml.ebxml30.RetrieveDocumentSetResponseType.DocumentResponse;
-import org.openehealth.ipf.commons.ihe.xds.core.metadata.AvailabilityStatus;
 import org.openehealth.ipf.commons.ihe.xds.core.metadata.Code;
 import org.openehealth.ipf.commons.ihe.xds.core.metadata.DocumentEntry;
 import org.openehealth.ipf.commons.ihe.xds.core.metadata.LocalizedString;
@@ -28,11 +24,11 @@ import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.query.AdhocQueryRequ
 import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.query.AdhocQueryResponse;
 import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.rs.RegistryError;
 import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.rs.RegistryResponseType;
-import org.openehealth.ipf.commons.ihe.xds.core.transform.requests.RegisterDocumentSetTransformer;
 import org.openehealth.ipf.commons.ihe.xds.core.transform.responses.QueryResponseTransformer;
 import org.openehealth.ipf.commons.ihe.xds.iti18.Iti18PortType;
 import org.openehealth.ipf.commons.ihe.xds.iti41.Iti41PortType;
 import org.openehealth.ipf.commons.ihe.xds.iti43.Iti43PortType;
+import org.openehealth.ipf.commons.ihe.xds.iti57.Iti57PortType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,8 +44,8 @@ public class AppointmentXdsRequestService {
 	@Autowired
 	AppointmentXdsRequestBuilderService appointmentXdsRequestBuilderService;
 
-	//@Autowired
-	//Iti57PortType iti57PortType;
+	@Autowired
+	Iti57PortType iti57PortType;
 
 	@Autowired
 	Iti43PortType iti43PortType;
@@ -59,7 +55,7 @@ public class AppointmentXdsRequestService {
 
 	@Autowired
 	Iti41PortType iti41PortType;
-
+	
 	public List<DocumentEntry> getAllAppointmentsForPatient(String citizenId) throws XdsException {
 		return getAppointmentsForPatient(citizenId, null, null);
 	}
@@ -68,9 +64,9 @@ public class AppointmentXdsRequestService {
 		List<Code> typeCodes = new ArrayList<Code>();
 		typeCodes.add(new Code("39289-4", new LocalizedString("Dato og tidspunkt for møde mellem patient og sundhedsperson"), "2.16.840.1.113883.6.1"));
 		AdhocQueryRequest adhocQueryRequest = appointmentXdsRequestBuilderService.buildAdhocQueryRequest(citizenId, typeCodes, start, end);
-		LOGGER.info("before xds call: documentRegistryRegistryStoredQuery");
+		LOGGER.debug("before xds call: documentRegistryRegistryStoredQuery");
 		AdhocQueryResponse adhocQueryResponse = iti18PortType.documentRegistryRegistryStoredQuery(adhocQueryRequest);
-		LOGGER.info("after xds call: documentRegistryRegistryStoredQuery");
+		LOGGER.debug("after xds call: documentRegistryRegistryStoredQuery");
 		if (adhocQueryResponse.getRegistryErrorList() != null && !adhocQueryResponse.getRegistryErrorList().getRegistryError().isEmpty()) {
 			throw new XdsException(adhocQueryResponse.getRegistryErrorList());
 		} else {
@@ -123,22 +119,22 @@ public class AppointmentXdsRequestService {
 	}
 
 
-	public void invalidateDocument(String documentId) {
-//		SubmitObjectsRequest submitObjectsRequest = new SubmitObjectsRequest();
+	public void deprecateDocument(String cpr, String documentEntryUUID, String repositoryId, String originalStatus) throws XdsException {	
 		
-		EbXMLFactory30 fact = new EbXMLFactory30();
-		EbXMLSubmitObjectsRequest esor = fact.createSubmitObjectsRequest();
-		EbXMLObjectLibrary objectLibrary = new EbXMLObjectLibrary();
-		EbXMLExtrinsicObject extrinsic = fact.createExtrinsic(documentId, objectLibrary);
-		extrinsic.setStatus(AvailabilityStatus.DEPRECATED);
-		esor.addExtrinsicObject(extrinsic);
+		SubmitObjectsRequest body = appointmentXdsRequestBuilderService.buildDeprecateSubmitObjectsRequest(cpr, documentEntryUUID, repositoryId, originalStatus);		
+		RegistryResponseType registryResponse = iti57PortType.documentRegistryUpdateDocumentSet(body);
 		
-		RegisterDocumentSetTransformer transforemer = new RegisterDocumentSetTransformer(getEbXmlFactory());
-		
-		
-		SubmitObjectsRequest body = new SubmitObjectsRequest();
-	//	body.setRegistryObjectList(esor.get);
-	//	iti57PortType.documentRegistryUpdateDocumentSet(body);
+		if (registryResponse.getRegistryErrorList() == null || registryResponse.getRegistryErrorList().getRegistryError() == null || registryResponse.getRegistryErrorList().getRegistryError().isEmpty()) {
+			//OK !
+		} else {
+			XdsException e = new XdsException();
+			for (RegistryError registryError :registryResponse.getRegistryErrorList().getRegistryError()) {
+				e.addError(registryError.getCodeContext());
+			}
+			throw e;
+		}
 	}
+	
+
 
 }

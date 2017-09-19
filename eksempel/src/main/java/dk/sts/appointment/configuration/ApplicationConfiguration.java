@@ -70,7 +70,7 @@ public class ApplicationConfiguration {
 			Client proxy = ClientProxy.getClient(client);
 			proxy.getOutInterceptors().add(new LoggingOutInterceptor());
 			proxy.getInInterceptors().add(new LoggingInInterceptor());
-		}
+		}	
 
 		return client;
 	}
@@ -113,8 +113,9 @@ public class ApplicationConfiguration {
 	public Iti57PortType getDocumentRepositoryServiceIti57() {
 		LOGGER.info("Creating Iti57PortType for url: "+xdsIti57Endpoint);
 
-		XdsClientFactory xdsClientFactory = generateXdsRegistryClientFactory("urn:ihe:iti:2010", xdsIti57Wsdl, xdsIti57Endpoint, Iti57PortType.class);
+		XdsClientFactory xdsClientFactory = generateXdsRegistryClientFactory("urn:ihe:iti:xds-b:2010", xdsIti57Wsdl, xdsIti57Endpoint, Iti57PortType.class);
 		Iti57PortType client = (Iti57PortType) xdsClientFactory.getClient();
+
 		if (LOGGER.isDebugEnabled()) {
 			Client proxy = ClientProxy.getClient(client);
 			proxy.getOutInterceptors().add(new LoggingOutInterceptor());
