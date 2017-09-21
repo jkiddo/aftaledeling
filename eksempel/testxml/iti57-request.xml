@@ -1,0 +1,75 @@
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+	<soap:Header>
+		<Action soap:mustUnderstand="true"
+			xmlns="http://www.w3.org/2005/08/addressing">urn:ihe:iti:2010:UpdateDocumentSet</Action>
+		<MessageID xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:af805bdf-7f04-4f4d-bd67-bd27a16c3a41
+		</MessageID>
+		<To xmlns="http://www.w3.org/2005/08/addressing">https://sdsxdsudv.kvalitetsit.dk:8443/registry/services/xds-iti57
+		</To>
+		<ReplyTo soap:mustUnderstand="true"
+			xmlns="http://www.w3.org/2005/08/addressing">
+			<Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
+		</ReplyTo>
+	</soap:Header>
+	<soap:Body>
+		<ns5:SubmitObjectsRequest
+			xmlns:ns6="urn:oasis:names:tc:ebxml-regrep:xsd:query:3.0" xmlns:ns5="urn:oasis:names:tc:ebxml-regrep:xsd:lcm:3.0"
+			xmlns:ns4="urn:ihe:iti:xds-b:2007" xmlns:ns3="urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0"
+			xmlns:ns2="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0">
+			<ns2:RegistryObjectList>
+				<ns2:RegistryPackage
+					objectType="urn:oasis:names:tc:ebxml-regrep:ObjectType:RegistryObject:RegistryPackage"
+					id="SubmissionSet">
+					<ns2:Slot name="submissionTime">
+						<ns2:ValueList>
+							<ns2:Value>20170921153121</ns2:Value>
+						</ns2:ValueList>
+					</ns2:Slot>
+					<ns2:Classification classifiedObject="SubmissionSet"
+						classificationNode="urn:uuid:a54d6aa5-d40d-43f9-88c5-b4633d873bdd" />
+					<ns2:Classification classificationScheme="urn:uuid:aa543740-bdda-424e-8c96-df4873be8500"
+						classifiedObject="SubmissionSet" nodeRepresentation="39289-4"
+						objectType="urn:oasis:names:tc:ebxml-regrep:ObjectType:RegistryObject:Classification">
+						<ns2:Slot name="codingScheme">
+							<ns2:ValueList>
+								<ns2:Value>2.16.840.1.113883.6.1</ns2:Value>
+							</ns2:ValueList>
+						</ns2:Slot>
+						<ns2:Name>
+							<ns2:LocalizedString
+								value="Dato og tidspunkt for møde mellem patient og sundhedsperson" />
+						</ns2:Name>
+					</ns2:Classification>
+					<ns2:ExternalIdentifier registryObject="SubmissionSet"
+						identificationScheme="urn:uuid:96fdda7c-d067-4183-912e-bf5ee74998a8"
+						value="urn:uuid:610bc99d-367f-4b18-b576-00edd9edd192"
+						objectType="urn:oasis:names:tc:ebxml-regrep:ObjectType:RegistryObject:ExternalIdentifier" />
+					<ns2:ExternalIdentifier registryObject="SubmissionSet"
+						identificationScheme="urn:uuid:6b5aea1a-874d-4603-a4bc-96a0a7b38446"
+						value="2512489996^^^&amp;1.2.208.176.1.2&amp;ISO"
+						objectType="urn:oasis:names:tc:ebxml-regrep:ObjectType:RegistryObject:ExternalIdentifier" />
+					<ns2:ExternalIdentifier registryObject="SubmissionSet"
+						identificationScheme="urn:uuid:554ac39e-e3fe-47fe-b233-965d2a147832"
+						value="1.2.208.176.43210.8.88.1.30"
+						objectType="urn:oasis:names:tc:ebxml-regrep:ObjectType:RegistryObject:ExternalIdentifier" />
+				</ns2:RegistryPackage>
+				<ns2:Association
+					associationType="urn:ihe:iti:2010:AssociationType:UpdateAvailabilityStatus"
+					sourceObject="SubmissionSet" targetObject="urn:uuid:610bc99d-367f-4b18-b576-00edd9edd192">
+					<ns2:Slot name="OriginalStatus">
+						<ns2:ValueList>
+							<ns2:Value>urn:oasis:names:tc:ebxml-regrep:StatusType:Approved
+							</ns2:Value>
+						</ns2:ValueList>
+					</ns2:Slot>
+					<ns2:Slot name="NewStatus">
+						<ns2:ValueList>
+							<ns2:Value>urn:oasis:names:tc:ebxml-regrep:StatusType:Deprecated
+							</ns2:Value>
+						</ns2:ValueList>
+					</ns2:Slot>
+				</ns2:Association>
+			</ns2:RegistryObjectList>
+		</ns5:SubmitObjectsRequest>
+	</soap:Body>
+</soap:Envelope>

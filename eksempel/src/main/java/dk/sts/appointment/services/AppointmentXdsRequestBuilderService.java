@@ -28,11 +28,9 @@ import org.openehealth.ipf.commons.ihe.xds.core.metadata.DocumentEntry;
 import org.openehealth.ipf.commons.ihe.xds.core.metadata.DocumentEntryType;
 import org.openehealth.ipf.commons.ihe.xds.core.metadata.Identifiable;
 import org.openehealth.ipf.commons.ihe.xds.core.metadata.LocalizedString;
-import org.openehealth.ipf.commons.ihe.xds.core.metadata.Name;
 import org.openehealth.ipf.commons.ihe.xds.core.metadata.Organization;
-import org.openehealth.ipf.commons.ihe.xds.core.metadata.PatientInfo;
 import org.openehealth.ipf.commons.ihe.xds.core.metadata.SubmissionSet;
-import org.openehealth.ipf.commons.ihe.xds.core.metadata.XpnName;
+import org.openehealth.ipf.commons.ihe.xds.core.metadata.Vocabulary;
 import org.openehealth.ipf.commons.ihe.xds.core.requests.ProvideAndRegisterDocumentSet;
 import org.openehealth.ipf.commons.ihe.xds.core.requests.QueryRegistry;
 import org.openehealth.ipf.commons.ihe.xds.core.requests.query.FindDocumentsQuery;
@@ -60,73 +58,66 @@ import com.sun.istack.ByteArrayDataSource;
 
 import dk.sts.appointment.dto.DocumentMetadata;
 import dk.sts.appointment.utilities.PatientIdAuthority;
-import dk.sts.appointment.utilities.UUID;
 
 public class AppointmentXdsRequestBuilderService {
 
 	@Value("${xds.repositoryuniqueid}")
 	String repositoryUniqueId;
-	
+
 	@Autowired
 	PatientIdAuthority patientIdAuthority;
-	
+
 	public ProvideAndRegisterDocumentSetRequestType buildProvideAndRegisterDocumentSetRequest(String extenalDocumentId, String documentPayload, DocumentMetadata documentMetadata) {
 
 		DateFormat dateTimeFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 		ProvideAndRegisterDocumentSet provideAndRegisterDocumentSet = new ProvideAndRegisterDocumentSet();
-		
+
+		// Create DocumentEntry for the CDA codument
+		DocumentEntry documentEntry = new DocumentEntry();
+		String documentUuid = generateUUID();
+		documentEntry.setEntryUuid(documentUuid);
+
+		// Patient Identification
 		Identifiable patientIdentifiable = null;
 		if (documentMetadata.getPatientId() != null) {
 			AssigningAuthority patientIdAssigningAuthority = new AssigningAuthority(documentMetadata.getPatientId().getSchemeName());
 			patientIdentifiable = new Identifiable(documentMetadata.getPatientId().getCode(), patientIdAssigningAuthority);
 		}
+		documentEntry.setPatientId(patientIdentifiable);
+		documentEntry.setSourcePatientId(patientIdentifiable);
 
+
+		// Create author (Organisation)
 		AssigningAuthority organisationAssigningAuthority = new AssigningAuthority(documentMetadata.getOrganisation().getSchemeName());
 		Author author = new Author();
 		if (documentMetadata.getOrganisation() != null && documentMetadata.getOrganisation().getCode() != null) {
 			Organization authorOrganisation = new Organization(documentMetadata.getOrganisation().getDisplayName().getValue(), documentMetadata.getOrganisation().getCode(), organisationAssigningAuthority);
 			author.getAuthorInstitution().add(authorOrganisation);
 		}
-
-		SubmissionSet submissionSet = createSubmissionSet(author, patientIdentifiable);
-		
-		//submissionSet.setContentTypeCode(createCode(documentMetadata.getContentTypeCode()));
-		
-		if (documentMetadata.getReportTime() != null) {
-			String timestamp = dateTimeFormat.format(documentMetadata.getReportTime());
-			submissionSet.setSubmissionTime(timestamp);
-		}
-		provideAndRegisterDocumentSet.setSubmissionSet(submissionSet);
-		
-		String documentUuid = generateUUID();
-		
-		DocumentEntry documentEntry = new DocumentEntry();
-		
-		// 4.1 Patient Identification
-		documentEntry.setPatientId(patientIdentifiable);
-		documentEntry.setSourcePatientId(patientIdentifiable);
-
-		// 4.2 Name, Address and Telecommunications
-		PatientInfo sourcePatientInfo = new PatientInfo();
-		documentEntry.setSourcePatientInfo(sourcePatientInfo);
-
-		// 4.2.1 Name
-		Name<?> name = new XpnName();
-		
-		sourcePatientInfo.setName(name);
-		documentEntry.setEntryUuid(generateUUID());
 		documentEntry.setAuthor(author);
+
+		// Availability Status (enumeration: APPROVED, SUBMITTED, DEPRECATED)
 		documentEntry.setAvailabilityStatus(AvailabilityStatus.APPROVED);
+
+		// Dates 
+		if (documentMetadata.getReportTime() != null) {
+			documentEntry.setCreationTime(dateTimeFormat.format(documentMetadata.getReportTime()));
+		}
+		if (documentMetadata.getServiceStartTime() != null) {
+			documentEntry.setServiceStartTime(dateTimeFormat.format(documentMetadata.getServiceStartTime()));
+		}
+		if (documentMetadata.getServiceStopTime() != null) {
+			documentEntry.setServiceStopTime(dateTimeFormat.format(documentMetadata.getServiceStopTime()));
+		}
+
+		
 		if (documentMetadata.getClassCode() != null) {
 			documentEntry.setClassCode(documentMetadata.getClassCode());
 		}
 		if (documentMetadata.getConfidentialityCode() != null) {
 			documentEntry.getConfidentialityCodes().add(documentMetadata.getConfidentialityCode());
 		}
-		documentEntry.setCreationTime(dateTimeFormat.format(documentMetadata.getReportTime()));
-		
-		documentEntry.setServiceStartTime(dateTimeFormat.format(documentMetadata.getServiceStartTime()));
-		
+
 		List<Code> eventCodesEntry = documentEntry.getEventCodeList();
 		if (documentMetadata.getEventCodes() != null) {
 			for (Code eventCode : documentMetadata.getEventCodes()) {
@@ -155,29 +146,47 @@ public class AppointmentXdsRequestBuilderService {
 		if (documentMetadata.getPracticeSettingCode() != null) {
 			documentEntry.setPracticeSettingCode(documentMetadata.getPracticeSettingCode());
 		}
-		
 		documentEntry.setUniqueId(extenalDocumentId);
 		documentEntry.setLogicalUuid(documentUuid);
 
 		Document document = new Document(documentEntry, new DataHandler(new ByteArrayDataSource(documentPayload.getBytes(), documentMetadata.getMimeType())));
 		provideAndRegisterDocumentSet.getDocuments().add(document);
 
+		// Create SubmissionSet for the document
+		SubmissionSet submissionSet = createSubmissionSet(patientIdentifiable, documentMetadata.getContentTypeCode(), documentMetadata.getReportTime());
+		provideAndRegisterDocumentSet.setSubmissionSet(submissionSet);
+
+		// Associate the SubmissionSet with the DocumentEntry
 		Association association = new Association();
 		association.setAssociationType(AssociationType.HAS_MEMBER);
 		association.setEntryUuid(generateUUID());
 		association.setSourceUuid(submissionSet.getEntryUuid());
 		association.setTargetUuid(documentEntry.getEntryUuid());
 		association.setAvailabilityStatus(AvailabilityStatus.APPROVED);
-		association.setOriginalStatus(AvailabilityStatus.APPROVED);
-		association.setNewStatus(AvailabilityStatus.APPROVED);
 		association.setLabel(AssociationLabel.ORIGINAL);
 		provideAndRegisterDocumentSet.getAssociations().add(association);
 
+		// Transform request
 		ProvideAndRegisterDocumentSetTransformer registerDocumentSetTransformer = new ProvideAndRegisterDocumentSetTransformer(getEbXmlFactory());
 		EbXMLProvideAndRegisterDocumentSetRequest30 ebxmlRequest = (EbXMLProvideAndRegisterDocumentSetRequest30) registerDocumentSetTransformer.toEbXML(provideAndRegisterDocumentSet);
 		ProvideAndRegisterDocumentSetRequestType provideAndRegisterDocumentSetRequestType = ebxmlRequest.getInternal();
 
 		return provideAndRegisterDocumentSetRequestType;
+	}
+
+	
+	public SubmitObjectsRequest buildDeprecateSubmitObjectsRequest(DocumentEntry documentEntry) {
+		
+		ObjectFactory factory = new ObjectFactory();
+		SubmitObjectsRequest body = new SubmitObjectsRequest();
+		RegistryObjectListType registryObjectList = factory.createRegistryObjectListType();
+		RegistryPackageType registryPackageType = makeRegistryPackageType(documentEntry);
+		registryObjectList.getIdentifiable().add(factory.createRegistryPackage(registryPackageType));
+		registryObjectList.getIdentifiable().add(factory.createAssociation(makeAssociation(documentEntry.getEntryUuid(), documentEntry.getAvailabilityStatus().getQueryOpcode(), AvailabilityStatus.DEPRECATED.getQueryOpcode())));
+
+		body.setRegistryObjectList(registryObjectList);
+
+		return body;
 	}
 
 
@@ -196,7 +205,7 @@ public class AppointmentXdsRequestBuilderService {
 	public AdhocQueryRequest buildAdhocQueryRequest(String citizenId, List<Code> typeCodes, Date start, Date end) {
 		return buildAdhocQueryRequest(citizenId, typeCodes, AvailabilityStatus.APPROVED, start, end);
 	}
-	
+
 	public AdhocQueryRequest buildAdhocQueryRequest(String citizenId, List<Code> typeCodes, AvailabilityStatus availabilityStatus, Date start, Date end) {
 		FindDocumentsQuery fdq = new FindDocumentsQuery();
 		DateFormat dateTimeFormat = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -214,38 +223,43 @@ public class AppointmentXdsRequestBuilderService {
 		if (typeCodes != null) {
 			fdq.setTypeCodes(typeCodes);
 		}
-		
+
 		if (start != null) {
 			fdq.getServiceStartTime().setFrom(dateTimeFormat.format(start));
 		}
-		
+
 		if (end != null) {
 			fdq.getServiceStartTime().setTo(dateTimeFormat.format(end));
 		}
-		
+
 
 		QueryRegistry queryRegistry = new QueryRegistry(fdq);
 		QueryReturnType qrt = QueryReturnType.LEAF_CLASS;
-		
+
 		if (qrt != null) {
 			queryRegistry.setReturnType(qrt);
 		}
-		
+
 		QueryRegistryTransformer queryRegistryTransformer = new QueryRegistryTransformer();
 		EbXMLAdhocQueryRequest ebxmlAdhocQueryRequest = queryRegistryTransformer.toEbXML(queryRegistry);
 		AdhocQueryRequest internal = (AdhocQueryRequest)ebxmlAdhocQueryRequest.getInternal();
 
 		return internal;
 	}
-	
+
 	public AdhocQueryRequest buildAdhocQueryRequest(String documentId) {
+		return buildAdhocQueryRequest(documentId, QueryReturnType.LEAF_CLASS);
+	}
+	
+	public AdhocQueryRequest buildAdhocQueryRequest(String documentId, QueryReturnType qrt) {
 		GetDocumentsAndAssociationsQuery getQuery = new GetDocumentsAndAssociationsQuery();
 		List<String> uniqueIds = new LinkedList<String>();
 		uniqueIds.add(documentId);
 		getQuery.setUniqueIds(uniqueIds);
-		return createAdhocQueryRequest(getQuery, QueryReturnType.LEAF_CLASS);
+		return createAdhocQueryRequest(getQuery, qrt);
 	}
 	
+
 	private AdhocQueryRequest createAdhocQueryRequest(Query query, QueryReturnType qrt) {
 		QueryRegistry queryRegistry = new QueryRegistry(query);
 		if (qrt != null) {
@@ -257,21 +271,23 @@ public class AppointmentXdsRequestBuilderService {
 
 		return internal;
 	}
-	
 
-	protected SubmissionSet createSubmissionSet(Author author, Identifiable patientIdentifiable) {
+
+	protected SubmissionSet createSubmissionSet(Identifiable patientIdentifiable, Code contentTypeCode, Date submissionTime) {
 		String submissionSetUuid = generateUUID();
 		SubmissionSet submissionSet = new SubmissionSet();
 		submissionSet.setUniqueId(submissionSetUuid);
 		submissionSet.setSourceId(submissionSetUuid);
-		submissionSet.setLogicalUuid(submissionSetUuid);
 		submissionSet.setEntryUuid(submissionSetUuid);
 		submissionSet.setPatientId(patientIdentifiable);
-		submissionSet.setTitle(new LocalizedString(submissionSetUuid));
-		submissionSet.setAuthor(author);
-		// What to do here???
-		submissionSet.setContentTypeCode(new Code("NscContentType", new LocalizedString("NscContentType"), UUID.XDSSubmissionSet_contentTypeCode));
+		submissionSet.setContentTypeCode(contentTypeCode);
 		submissionSet.setAvailabilityStatus(AvailabilityStatus.APPROVED);
+		
+		if (submissionTime != null) {
+			DateFormat dateTimeFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+			String timestamp = dateTimeFormat.format(submissionTime);
+			submissionSet.setSubmissionTime(timestamp);
+		}
 		return submissionSet;
 	}
 
@@ -286,63 +302,49 @@ public class AppointmentXdsRequestBuilderService {
 		return Math.abs(uuid.getLeastSignificantBits()) + "." + Math.abs(uuid.getMostSignificantBits())+"."+Calendar.getInstance().getTimeInMillis();
 	}
 
-
-	public SubmitObjectsRequest buildDeprecateSubmitObjectsRequest(String cpr, String documentEntryUUID, String repositoryId, String originalStatus) {
-		
-		ObjectFactory factory = new ObjectFactory();
-		
-		SubmitObjectsRequest body = new SubmitObjectsRequest();
-		
-		RegistryObjectListType registryObjectList = factory.createRegistryObjectListType();
-		registryObjectList.getIdentifiable().add(factory.createRegistryPackage(makeRegistryPackageType(cpr,repositoryId,documentEntryUUID,"NscContentType","CodingScheme")));
-		registryObjectList.getIdentifiable().add(factory.createAssociation(makeAssociation(documentEntryUUID, originalStatus, AvailabilityStatus.DEPRECATED.getQueryOpcode())));
-		
-		body.setRegistryObjectList(registryObjectList);
-		
-		return body;
-	}
-	
 	private AssociationType1 makeAssociation(String documentEntryUUID, String originalStatus, String newStatus) {
 		AssociationType1 assocation = new AssociationType1();
-		
+
 		assocation.setAssociationType(AssociationType.UPDATE_AVAILABILITY_STATUS.getOpcode30());
 		assocation.setSourceObject("SubmissionSet");
 		assocation.setTargetObject(documentEntryUUID);
-		assocation.getSlot().add(makeSlot("OriginalStatus", originalStatus));
-		assocation.getSlot().add(makeSlot("NewStatus", newStatus));
-		
+		assocation.getSlot().add(makeSlot(Vocabulary.SLOT_NAME_ORIGINAL_STATUS, originalStatus));
+		assocation.getSlot().add(makeSlot(Vocabulary.SLOT_NAME_NEW_STATUS, newStatus));
+
 		return assocation;
-		
+
 	}
 	
-	private RegistryPackageType makeRegistryPackageType(String cpr, String sourceId, String uniqueId, String contentType, String contentTypeCodingScheme) {
+	private RegistryPackageType makeRegistryPackageType(DocumentEntry documentEntry) {
 		RegistryPackageType registryPackage = new RegistryPackageType();
-		
-		DateFormat dateTimeFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-		
-		ClassificationType classificationNode = new ClassificationType();
-		classificationNode.setClassifiedObject("SubmissionSet");
-		classificationNode.setClassificationNode(UUID.XDSSubmissionSet_classificationNode);
-		
-		ClassificationType contentTypeClassification = new ClassificationType();
-		contentTypeClassification.setClassifiedObject("SubmissionSet");
-		contentTypeClassification.setClassificationScheme(UUID.XDSSubmissionSet_contentTypeCode);		
-		contentTypeClassification.setObjectType("urn:oasis:names:tc:ebxml-regrep:ObjectType:RegistryObject:Classification");
-		contentTypeClassification.setNodeRepresentation(contentType);
-		contentTypeClassification.setName(makeInternationalStringType(contentType));		
-		contentTypeClassification.getSlot().add(makeSlot("codingScheme", contentTypeCodingScheme));
-		
 		registryPackage.setId("SubmissionSet");
 		registryPackage.setObjectType("urn:oasis:names:tc:ebxml-regrep:ObjectType:RegistryObject:RegistryPackage");
 		
-		registryPackage.getExternalIdentifier().add(makeExternalIdentifier(UUID.XDSSubmissionSet_uniqueId, uniqueId));
-		registryPackage.getExternalIdentifier().add(makeExternalIdentifier(UUID.XDSSubmissionSet_patientId, patientIdAuthority.formatPatientIdentifier(cpr)));
-		registryPackage.getExternalIdentifier().add(makeExternalIdentifier(UUID.XDSSubmissionSet_sourceId, sourceId));
+		String cpr = documentEntry.getPatientId().getId();
+		String entryUuid = documentEntry.getEntryUuid();
+		String sourceId = documentEntry.getRepositoryUniqueId();
 		
+		ClassificationType classificationNode = new ClassificationType();
+		classificationNode.setClassifiedObject("SubmissionSet");
+		classificationNode.setClassificationNode(Vocabulary.SUBMISSION_SET_CLASS_NODE);
 		registryPackage.getClassification().add(classificationNode);
+		
+		Code docEntryTypeCode = documentEntry.getTypeCode();
+		ClassificationType contentTypeClassification = new ClassificationType();
+		contentTypeClassification.setClassifiedObject("SubmissionSet");
+		contentTypeClassification.setClassificationScheme(Vocabulary.SUBMISSION_SET_CONTENT_TYPE_CODE_CLASS_SCHEME);		
+		contentTypeClassification.setObjectType("urn:oasis:names:tc:ebxml-regrep:ObjectType:RegistryObject:Classification");
+		contentTypeClassification.setNodeRepresentation(docEntryTypeCode.getCode());
+		contentTypeClassification.setName(makeInternationalStringType(docEntryTypeCode.getDisplayName().getValue()));		
+		contentTypeClassification.getSlot().add(makeSlot("codingScheme", docEntryTypeCode.getSchemeName()));
 		registryPackage.getClassification().add(contentTypeClassification);
 		
-		registryPackage.getSlot().add(makeSlot("submissionTime", dateTimeFormat.format(new Date())));
+		registryPackage.getExternalIdentifier().add(makeExternalIdentifier(Vocabulary.SUBMISSION_SET_UNIQUE_ID_EXTERNAL_ID, entryUuid));
+		registryPackage.getExternalIdentifier().add(makeExternalIdentifier(Vocabulary.SUBMISSION_SET_PATIENT_ID_EXTERNAL_ID, patientIdAuthority.formatPatientIdentifier(cpr)));
+		registryPackage.getExternalIdentifier().add(makeExternalIdentifier(Vocabulary.SUBMISSION_SET_SOURCE_ID_EXTERNAL_ID, sourceId));
+		
+		DateFormat dateTimeFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+		registryPackage.getSlot().add(makeSlot(Vocabulary.SLOT_NAME_SUBMISSION_TIME, dateTimeFormat.format(new Date())));
 		
 		return registryPackage;
 	}
@@ -355,15 +357,19 @@ public class AppointmentXdsRequestBuilderService {
 		slot.setValueList(slotList);		
 		return slot;	
 	}
-	
+
 	private InternationalStringType makeInternationalStringType(String value) {
-		InternationalStringType ist = new InternationalStringType();
 		LocalizedStringType lst = new LocalizedStringType();		
 		lst.setValue(value);
-		ist.getLocalizedString().add(lst);
+		return makeInternationalStringType(lst);
+	}
+
+	private InternationalStringType makeInternationalStringType(LocalizedStringType value) {
+		InternationalStringType ist = new InternationalStringType();
+		ist.getLocalizedString().add(value);
 		return ist;
 	}
-	
+
 	private ExternalIdentifierType makeExternalIdentifier(String identificationScheme, String value) {
 		ExternalIdentifierType externalIdentifier = new ExternalIdentifierType();
 		externalIdentifier.setObjectType("urn:oasis:names:tc:ebxml-regrep:ObjectType:RegistryObject:ExternalIdentifier");
@@ -372,5 +378,4 @@ public class AppointmentXdsRequestBuilderService {
 		externalIdentifier.setRegistryObject("SubmissionSet");
 		return externalIdentifier;
 	}
-	
 }

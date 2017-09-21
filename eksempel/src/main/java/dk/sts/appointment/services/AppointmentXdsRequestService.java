@@ -17,7 +17,7 @@ import org.openehealth.ipf.commons.ihe.xds.core.ebxml.ebxml30.RetrieveDocumentSe
 import org.openehealth.ipf.commons.ihe.xds.core.ebxml.ebxml30.RetrieveDocumentSetResponseType.DocumentResponse;
 import org.openehealth.ipf.commons.ihe.xds.core.metadata.Code;
 import org.openehealth.ipf.commons.ihe.xds.core.metadata.DocumentEntry;
-import org.openehealth.ipf.commons.ihe.xds.core.metadata.LocalizedString;
+import org.openehealth.ipf.commons.ihe.xds.core.requests.query.QueryReturnType;
 import org.openehealth.ipf.commons.ihe.xds.core.responses.QueryResponse;
 import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.lcm.SubmitObjectsRequest;
 import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.query.AdhocQueryRequest;
@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import dk.sts.appointment.AppointmentConstants;
 import dk.sts.appointment.dto.DocumentMetadata;
 
 public class AppointmentXdsRequestService {
@@ -62,11 +63,9 @@ public class AppointmentXdsRequestService {
 	
 	public List<DocumentEntry> getAppointmentsForPatient(String citizenId, Date start, Date end) throws XdsException {
 		List<Code> typeCodes = new ArrayList<Code>();
-		typeCodes.add(new Code("39289-4", new LocalizedString("Dato og tidspunkt for møde mellem patient og sundhedsperson"), "2.16.840.1.113883.6.1"));
+		typeCodes.add(AppointmentConstants.APPOINTMENT_CODE);
 		AdhocQueryRequest adhocQueryRequest = appointmentXdsRequestBuilderService.buildAdhocQueryRequest(citizenId, typeCodes, start, end);
-		LOGGER.debug("before xds call: documentRegistryRegistryStoredQuery");
 		AdhocQueryResponse adhocQueryResponse = iti18PortType.documentRegistryRegistryStoredQuery(adhocQueryRequest);
-		LOGGER.debug("after xds call: documentRegistryRegistryStoredQuery");
 		if (adhocQueryResponse.getRegistryErrorList() != null && !adhocQueryResponse.getRegistryErrorList().getRegistryError().isEmpty()) {
 			throw new XdsException(adhocQueryResponse.getRegistryErrorList());
 		} else {
@@ -78,12 +77,10 @@ public class AppointmentXdsRequestService {
 		}
 	}
 	
-	public DocumentEntry getAppointment(String documentId) throws XdsException {
+	public DocumentEntry getAppointmentDocumentEntry(String documentId) throws XdsException {
 
-		AdhocQueryRequest adhocQueryRequest = appointmentXdsRequestBuilderService.buildAdhocQueryRequest(documentId);
-		
+		AdhocQueryRequest adhocQueryRequest = appointmentXdsRequestBuilderService.buildAdhocQueryRequest(documentId, QueryReturnType.LEAF_CLASS);
 		AdhocQueryResponse adhocQueryResponse = iti18PortType.documentRegistryRegistryStoredQuery(adhocQueryRequest);
-
 		
 		if (adhocQueryResponse.getRegistryErrorList() != null && !adhocQueryResponse.getRegistryErrorList().getRegistryError().isEmpty()) {
 			throw new XdsException(adhocQueryResponse.getRegistryErrorList());
@@ -92,7 +89,8 @@ public class AppointmentXdsRequestService {
 			EbXMLQueryResponse30 ebXmlresponse = new EbXMLQueryResponse30(adhocQueryResponse);
 			QueryResponse queryResponse = queryResponseTransformer.fromEbXML(ebXmlresponse);
 			List<DocumentEntry> docEntries = queryResponse.getDocumentEntries();
-			return docEntries.get(0);
+			DocumentEntry documentEntry = docEntries.get(0);
+			return documentEntry;
 		}
 	}
 	
@@ -138,9 +136,8 @@ public class AppointmentXdsRequestService {
 	}
 
 
-	public void deprecateDocument(String cpr, String documentEntryUUID, String repositoryId, String originalStatus) throws XdsException {	
-		
-		SubmitObjectsRequest body = appointmentXdsRequestBuilderService.buildDeprecateSubmitObjectsRequest(cpr, documentEntryUUID, repositoryId, originalStatus);		
+	public void deprecateDocument(DocumentEntry toBeDeprecated) throws XdsException {
+		SubmitObjectsRequest body = appointmentXdsRequestBuilderService.buildDeprecateSubmitObjectsRequest(toBeDeprecated);		
 		RegistryResponseType registryResponse = iti57PortType.documentRegistryUpdateDocumentSet(body);
 		
 		if (registryResponse.getRegistryErrorList() == null || registryResponse.getRegistryErrorList().getRegistryError() == null || registryResponse.getRegistryErrorList().getRegistryError().isEmpty()) {
@@ -153,7 +150,4 @@ public class AppointmentXdsRequestService {
 			throw e;
 		}
 	}
-	
-
-
 }

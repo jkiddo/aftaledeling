@@ -35,13 +35,13 @@ public class UUID {
   public static final String XDSDocumentEntry_patientId             = "urn:uuid:58a6f841-87b3-4a3e-92fd-a8ffeff98427";
   public static final String XDSDocumentEntry_author	            = "urn:uuid:93606bcf-9494-43ec-9b4e-a7748d1a838d";
 
+  public static final String XDSSubmissionSet_classificationNode    = "urn:uuid:a54d6aa5-d40d-43f9-88c5-b4633d873bdd";
 
   
   
   public static final String XDSSubmissionSet_uniqueId              = "urn:uuid:96fdda7c-d067-4183-912e-bf5ee74998a8";
   public static final String XDSSubmissionSet_sourceId              = "urn:uuid:554ac39e-e3fe-47fe-b233-965d2a147832";
   public static final String XDSSubmissionSet_patientId             = "urn:uuid:6b5aea1a-874d-4603-a4bc-96a0a7b38446";
-  public static final String XDSSubmissionSet_classificationNode    = "urn:uuid:a54d6aa5-d40d-43f9-88c5-b4633d873bdd";
   public static final String XDSSubmissionSet_author                = "urn:uuid:a7058bb9-b4e4-4307-ba5b-e3f0ab85e12d";
   public static final String XDSSubmissionSet_contentTypeCode       = "urn:uuid:aa543740-bdda-424e-8c96-df4873be8500";
 }

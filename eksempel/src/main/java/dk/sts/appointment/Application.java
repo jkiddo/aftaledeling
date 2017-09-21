@@ -42,11 +42,12 @@ import dk.sts.appointment.utilities.Codes;
 public class Application implements CommandLineRunner {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
-
+	
 	@Autowired
 	AppointmentXdsRequestService appointmentXdsRequestService;
 	
 	private static String PATIENT_ID = "2512489996";
+	
 
 	public static void main(String[] args) throws Exception {
 		LOGGER.debug("Starting application");
@@ -57,45 +58,43 @@ public class Application implements CommandLineRunner {
 
 	public void run(String... args) throws Exception {
 
-		// Fremsøg aftaler for patienten
+		// Search documents for patient
 		List<DocumentEntry> currentAppointments = appointmentXdsRequestService.getAllAppointmentsForPatient(PATIENT_ID);
 		System.out.println("The patient with id="+PATIENT_ID+" has "+currentAppointments.size()+" registered in the XDS registry.");
 
-		// Register appointment
+		// Register appointment (data extracted from the example file)
 		String appointmentXmlDocument = getXmlFileContent("/DK-APD_Example_1.xml");
 		DocumentMetadata appointmentCdaMetadata = new DocumentMetadata();
-
+		appointmentCdaMetadata.setTitle("Aftale for "+PATIENT_ID);
 		appointmentCdaMetadata.setPatientId(new Code(PATIENT_ID, null, Codes.DK_CPR_OID));
-		appointmentCdaMetadata.setReportTime(new SimpleDateFormat("yyyyMMddHHmmssZ").parse("20170531110000+0100"));
+		appointmentCdaMetadata.setReportTime(new SimpleDateFormat("yyyyMMddHHmmssZ").parse("20170113100000+0100"));
 		appointmentCdaMetadata.setOrganisation(new Code("242621000016001", new LocalizedString("OUH Radiologisk Afdeling (Svendborg)"), Codes.DK_SOR_CLASSIFICAION_OID));
 		appointmentCdaMetadata.setClassCode(new Code("001", new LocalizedString("Klinisk rapport"), "1.2.208.184.100.9"));
-		appointmentCdaMetadata.setFormatCode(new Code("urn:ad:dk:medcom:phmr:full", new LocalizedString("DK PHMR schema") ,"1.2.208.184.100.10"));
-		appointmentCdaMetadata.setHealthcareFacilityTypeCode(new Code("550621000005101", new LocalizedString("hjemmesygepleje") ,"2.16.840.1.113883.6.96"));
+		appointmentCdaMetadata.setFormatCode(new Code("urn:ad:dk:medcom:appointment", new LocalizedString("DK CDA APD") ,"1.2.208.184.14.1"));
+		appointmentCdaMetadata.setHealthcareFacilityTypeCode(new Code("22232009", new LocalizedString("hospital") ,"2.16.840.1.113883.6.96"));
 		appointmentCdaMetadata.setPracticeSettingCode(new Code("408443003", new LocalizedString("almen medicin"),"2.16.840.1.113883.6.96"));
 		appointmentCdaMetadata.setSubmissionTime(new Date());
-		appointmentCdaMetadata.setTypeCode(new Code("39289-4", new LocalizedString("Dato og tidspunkt for møde mellem patient og sundhedsperson"), "2.16.840.1.113883.6.1"));
-
-		appointmentCdaMetadata.setServiceStartTime(new Date());
-		
-		String externalId = generateUUID();
-		String documentId = appointmentXdsRequestService.createAndRegisterDocument(externalId, appointmentXmlDocument, appointmentCdaMetadata);
+		appointmentCdaMetadata.setContentTypeCode(AppointmentConstants.APPOINTMENT_CODE);
+		appointmentCdaMetadata.setTypeCode(AppointmentConstants.APPOINTMENT_CODE);
+		appointmentCdaMetadata.setServiceStartTime(new SimpleDateFormat("yyyyMMddHHmmssZ").parse("20170531110000+0100"));
+		appointmentCdaMetadata.setServiceStopTime(new SimpleDateFormat("yyyyMMddHHmmssZ").parse("20170531120000+0100"));
+		String externalIdForNewDocument = generateUUID();
+		String documentId = appointmentXdsRequestService.createAndRegisterDocument(externalIdForNewDocument, appointmentXmlDocument, appointmentCdaMetadata);
 		System.out.println("We registered a new appointment with documentId="+documentId);
 
-		// Fremsøg aftaler for patienten
+		// Search document for patient (we assume there is one more now)
 		List<DocumentEntry> currentAppointmentsAfterNewAppointment = appointmentXdsRequestService.getAllAppointmentsForPatient(PATIENT_ID);
 		System.out.println("The patient with id="+PATIENT_ID+" now has "+currentAppointmentsAfterNewAppointment.size()+" registered in the XDS registry.");
 
-		//Hent aftale
-		String document = appointmentXdsRequestService.fetchDocument(documentId);
+		// Get appointment document from id
+		String document = appointmentXdsRequestService.fetchDocument(externalIdForNewDocument);
 		System.out.println(document);
 		
-		//Hent det dokument som der skal deprecates
-		DocumentEntry toBeDeprecated = appointmentXdsRequestService.getAppointment(documentId);		
-		
-		appointmentXdsRequestService.deprecateDocument(toBeDeprecated.getPatientId().getId(), toBeDeprecated.getEntryUuid(), toBeDeprecated.getRepositoryUniqueId(), toBeDeprecated.getAvailabilityStatus().getQueryOpcode());
+		// Now we want to deprecate a document...but first we have to get the document entry from the registry
+		DocumentEntry toBeDeprecated = appointmentXdsRequestService.getAppointmentDocumentEntry(documentId);		
+		// ... then deprecate
+		appointmentXdsRequestService.deprecateDocument(toBeDeprecated);
 
-		//DocumentEntry afterDeprecation = appointmentXdsRequestService.getAppointment(documentId);	
-		
 		//Fremsøg aftaler for patienten
 		List<DocumentEntry> currentAppointmentsAfterDeprecation = appointmentXdsRequestService.getAllAppointmentsForPatient(PATIENT_ID);
 		System.out.println("The patient with id="+PATIENT_ID+" now has "+currentAppointmentsAfterDeprecation.size()+" registered in the XDS registry.");

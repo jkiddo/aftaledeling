@@ -16,7 +16,10 @@ public class DocumentMetadata extends CdaMetadata {
 	
 	@JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZ")
 	public Date serviceStartTime;	
-	
+
+	@JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZ")
+	public Date serviceStopTime;	
+
 	public Code organisation;
 
 	public Code typeCode;
@@ -121,6 +124,14 @@ public class DocumentMetadata extends CdaMetadata {
 
 	public void setServiceStartTime(Date serviceStartTime) {
 		this.serviceStartTime = serviceStartTime;
+	}
+
+	public void setServiceStopTime(Date serviceStopTime) {
+		this.serviceStopTime = serviceStopTime;
+	}
+
+	public Date getServiceStopTime() {
+		return this.serviceStopTime;
 	}
 
 }
