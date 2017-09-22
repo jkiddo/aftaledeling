@@ -2,8 +2,10 @@
 	<soap:Header>
 		<Action soap:mustUnderstand="true"
 			xmlns="http://www.w3.org/2005/08/addressing">urn:ihe:iti:2007:RegistryStoredQuery</Action>
-		<MessageID xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:f99a462d-4a28-426d-a950-d2fc953720b8</MessageID>
-		<To xmlns="http://www.w3.org/2005/08/addressing">https://sdsxdsudv.kvalitetsit.dk:8443/registry/services/xds-iti18</To>
+		<MessageID xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:6a19f336-fcd0-4b8d-bbc9-b700afbbd3a5
+		</MessageID>
+		<To xmlns="http://www.w3.org/2005/08/addressing">https://sdsxdsudv.kvalitetsit.dk:8443/registry/services/xds-iti18
+		</To>
 		<ReplyTo soap:mustUnderstand="true"
 			xmlns="http://www.w3.org/2005/08/addressing">
 			<Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
@@ -16,6 +18,11 @@
 			<ns4:ResponseOption returnType="LeafClass"
 				returnComposedObjects="true" />
 			<ns2:AdhocQuery id="urn:uuid:14d4debf-8f97-4251-9a74-a90016b0af0d">
+				<ns2:Slot name="$XDSDocumentEntryServiceStartTimeTo">
+					<ns2:ValueList>
+						<ns2:Value>20170531133000</ns2:Value>
+					</ns2:ValueList>
+				</ns2:Slot>
 				<ns2:Slot name="$XDSDocumentEntryTypeCode">
 					<ns2:ValueList>
 						<ns2:Value>('39289-4^^2.16.840.1.113883.6.1')</ns2:Value>
@@ -23,12 +30,13 @@
 				</ns2:Slot>
 				<ns2:Slot name="$XDSDocumentEntryPatientId">
 					<ns2:ValueList>
-						<ns2:Value>'2512489996^^^&amp;1.2.208.176.1.2&amp;ISO'</ns2:Value>
+						<ns2:Value>'ABCDEFGHIJ^^^&amp;1.2.208.176.1.2&amp;ISO'</ns2:Value>
 					</ns2:ValueList>
 				</ns2:Slot>
 				<ns2:Slot name="$XDSDocumentEntryStatus">
 					<ns2:ValueList>
-						<ns2:Value>('urn:oasis:names:tc:ebxml-regrep:StatusType:Approved')</ns2:Value>
+						<ns2:Value>('urn:oasis:names:tc:ebxml-regrep:StatusType:Approved')
+						</ns2:Value>
 					</ns2:ValueList>
 				</ns2:Slot>
 			</ns2:AdhocQuery>

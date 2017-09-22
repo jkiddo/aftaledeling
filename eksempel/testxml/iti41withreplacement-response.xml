@@ -1,9 +1,9 @@
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
 	<soap:Header>
 		<Action xmlns="http://www.w3.org/2005/08/addressing">urn:ihe:iti:2007:ProvideAndRegisterDocumentSet-bResponse</Action>
-		<MessageID xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:eb073d8e-349b-4fc7-ba91-78319f8448cb</MessageID>
+		<MessageID xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:60404925-ab6e-4866-afd2-bdfa131d0042</MessageID>
 		<To xmlns="http://www.w3.org/2005/08/addressing">http://www.w3.org/2005/08/addressing/anonymous</To>
-		<RelatesTo xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:2030fa8f-e721-4bd9-8a77-8579a1c0bfee</RelatesTo>
+		<RelatesTo xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:acaf4eee-c49a-42f8-97e1-945446315745</RelatesTo>
 	</soap:Header>
 	<soap:Body>
 		<ns3:RegistryResponse xmlns:ns6="urn:oasis:names:tc:ebxml-regrep:xsd:query:3.0"

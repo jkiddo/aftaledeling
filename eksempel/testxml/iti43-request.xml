@@ -2,8 +2,10 @@
 	<soap:Header>
 		<Action soap:mustUnderstand="true"
 			xmlns="http://www.w3.org/2005/08/addressing">urn:ihe:iti:2007:RetrieveDocumentSet</Action>
-		<MessageID xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:fb6975fd-603a-426b-85b1-26732fa41551</MessageID>
-		<To xmlns="http://www.w3.org/2005/08/addressing">https://sdsxdsudv.kvalitetsit.dk:9443/repository/services/xds-iti43</To>
+		<MessageID xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:96068af0-f469-47f9-8db5-91b568229f8f
+		</MessageID>
+		<To xmlns="http://www.w3.org/2005/08/addressing">https://sdsxdsudv.kvalitetsit.dk:9443/repository/services/xds-iti43
+		</To>
 		<ReplyTo soap:mustUnderstand="true"
 			xmlns="http://www.w3.org/2005/08/addressing">
 			<Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
@@ -15,8 +17,10 @@
 			xmlns:ns4="urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0" xmlns:ns3="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0"
 			xmlns:ns2="urn:ihe:iti:xds-b:2007">
 			<ns2:DocumentRequest>
-				<ns2:RepositoryUniqueId>1.2.208.176.43210.8.88.1.30</ns2:RepositoryUniqueId>
-				<ns2:DocumentUniqueId>4619091542759068279.4584476099589391958.1506000680164</ns2:DocumentUniqueId>
+				<ns2:RepositoryUniqueId>1.2.208.176.43210.8.88.1.30
+				</ns2:RepositoryUniqueId>
+				<ns2:DocumentUniqueId>8259842395306321041.4480078910598656356.1506062797976
+				</ns2:DocumentUniqueId>
 			</ns2:DocumentRequest>
 		</ns2:RetrieveDocumentSetRequest>
 	</soap:Body>

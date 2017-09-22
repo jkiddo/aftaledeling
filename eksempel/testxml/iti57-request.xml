@@ -2,7 +2,7 @@
 	<soap:Header>
 		<Action soap:mustUnderstand="true"
 			xmlns="http://www.w3.org/2005/08/addressing">urn:ihe:iti:2010:UpdateDocumentSet</Action>
-		<MessageID xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:af805bdf-7f04-4f4d-bd67-bd27a16c3a41
+		<MessageID xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:b3fa936a-a860-4890-bf6e-ac4486ea8b9d
 		</MessageID>
 		<To xmlns="http://www.w3.org/2005/08/addressing">https://sdsxdsudv.kvalitetsit.dk:8443/registry/services/xds-iti57
 		</To>
@@ -22,7 +22,7 @@
 					id="SubmissionSet">
 					<ns2:Slot name="submissionTime">
 						<ns2:ValueList>
-							<ns2:Value>20170921153121</ns2:Value>
+							<ns2:Value>20170922084639</ns2:Value>
 						</ns2:ValueList>
 					</ns2:Slot>
 					<ns2:Classification classifiedObject="SubmissionSet"
@@ -42,11 +42,11 @@
 					</ns2:Classification>
 					<ns2:ExternalIdentifier registryObject="SubmissionSet"
 						identificationScheme="urn:uuid:96fdda7c-d067-4183-912e-bf5ee74998a8"
-						value="urn:uuid:610bc99d-367f-4b18-b576-00edd9edd192"
+						value="urn:uuid:194ff3d4-a77a-4067-b721-6716ed2f43f7"
 						objectType="urn:oasis:names:tc:ebxml-regrep:ObjectType:RegistryObject:ExternalIdentifier" />
 					<ns2:ExternalIdentifier registryObject="SubmissionSet"
 						identificationScheme="urn:uuid:6b5aea1a-874d-4603-a4bc-96a0a7b38446"
-						value="2512489996^^^&amp;1.2.208.176.1.2&amp;ISO"
+						value="ABCDEFGHIJ^^^&amp;1.2.208.176.1.2&amp;ISO"
 						objectType="urn:oasis:names:tc:ebxml-regrep:ObjectType:RegistryObject:ExternalIdentifier" />
 					<ns2:ExternalIdentifier registryObject="SubmissionSet"
 						identificationScheme="urn:uuid:554ac39e-e3fe-47fe-b233-965d2a147832"
@@ -55,7 +55,7 @@
 				</ns2:RegistryPackage>
 				<ns2:Association
 					associationType="urn:ihe:iti:2010:AssociationType:UpdateAvailabilityStatus"
-					sourceObject="SubmissionSet" targetObject="urn:uuid:610bc99d-367f-4b18-b576-00edd9edd192">
+					sourceObject="SubmissionSet" targetObject="urn:uuid:194ff3d4-a77a-4067-b721-6716ed2f43f7">
 					<ns2:Slot name="OriginalStatus">
 						<ns2:ValueList>
 							<ns2:Value>urn:oasis:names:tc:ebxml-regrep:StatusType:Approved

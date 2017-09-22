@@ -67,7 +67,16 @@ public class AppointmentXdsRequestBuilderService {
 	@Autowired
 	PatientIdAuthority patientIdAuthority;
 
+	public ProvideAndRegisterDocumentSetRequestType buildProvideAndRegisterDocumentSetRequestWithReplacement(String externalIdForUpdatedDocument, String updatedAppointmentXmlDocument, DocumentMetadata updatedAppointmentCdaMetadata, String externalIdForDocumentToReplace) {
+		return buildProvideAndRegisterDocumentSetRequest(externalIdForUpdatedDocument, updatedAppointmentXmlDocument, updatedAppointmentCdaMetadata, externalIdForDocumentToReplace);
+	}
+
 	public ProvideAndRegisterDocumentSetRequestType buildProvideAndRegisterDocumentSetRequest(String extenalDocumentId, String documentPayload, DocumentMetadata documentMetadata) {
+		return buildProvideAndRegisterDocumentSetRequest(extenalDocumentId, documentPayload, documentMetadata, null);
+	}
+
+	
+	public ProvideAndRegisterDocumentSetRequestType buildProvideAndRegisterDocumentSetRequest(String extenalDocumentId, String documentPayload, DocumentMetadata documentMetadata, String externalIdForDocumentToReplace) {
 
 		DateFormat dateTimeFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 		ProvideAndRegisterDocumentSet provideAndRegisterDocumentSet = new ProvideAndRegisterDocumentSet();
@@ -165,6 +174,10 @@ public class AppointmentXdsRequestBuilderService {
 		association.setAvailabilityStatus(AvailabilityStatus.APPROVED);
 		association.setLabel(AssociationLabel.ORIGINAL);
 		provideAndRegisterDocumentSet.getAssociations().add(association);
+		if (externalIdForDocumentToReplace != null) {
+			Association replacementAssociation = new Association(AssociationType.REPLACE, generateUUID(), documentEntry.getEntryUuid(), externalIdForDocumentToReplace);
+			provideAndRegisterDocumentSet.getAssociations().add(replacementAssociation);
+		}
 
 		// Transform request
 		ProvideAndRegisterDocumentSetTransformer registerDocumentSetTransformer = new ProvideAndRegisterDocumentSetTransformer(getEbXmlFactory());

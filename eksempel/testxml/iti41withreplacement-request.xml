@@ -1,0 +1,466 @@
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+	<soap:Header>
+		<Action soap:mustUnderstand="true"
+			xmlns="http://www.w3.org/2005/08/addressing">urn:ihe:iti:2007:ProvideAndRegisterDocumentSet-b</Action>
+		<MessageID xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:acaf4eee-c49a-42f8-97e1-945446315745</MessageID>
+		<To xmlns="http://www.w3.org/2005/08/addressing">https://sdsxdsudv.kvalitetsit.dk:9443/repository/services/xds-iti41</To>
+		<ReplyTo soap:mustUnderstand="true"
+			xmlns="http://www.w3.org/2005/08/addressing">
+			<Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
+		</ReplyTo>
+	</soap:Header>
+	<soap:Body>
+		<ns4:ProvideAndRegisterDocumentSetRequest
+			xmlns:ns6="urn:oasis:names:tc:ebxml-regrep:xsd:query:3.0" xmlns:ns5="urn:oasis:names:tc:ebxml-regrep:xsd:lcm:3.0"
+			xmlns:ns4="urn:ihe:iti:xds-b:2007" xmlns:ns3="urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0"
+			xmlns:ns2="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0">
+			<ns5:SubmitObjectsRequest>
+				<ns2:RegistryObjectList>
+					<ns2:ExtrinsicObject
+						lid="9094771191499430498.3850557330642522022.1506062798700"
+						objectType="urn:uuid:7edca82f-054d-47f2-a032-9b2a5b5186c1" status="urn:oasis:names:tc:ebxml-regrep:StatusType:Approved"
+						id="9094771191499430498.3850557330642522022.1506062798700">
+						<ns2:Slot name="creationTime">
+							<ns2:ValueList>
+								<ns2:Value>20170113100000</ns2:Value>
+							</ns2:ValueList>
+						</ns2:Slot>
+						<ns2:Slot name="serviceStartTime">
+							<ns2:ValueList>
+								<ns2:Value>20170531130000</ns2:Value>
+							</ns2:ValueList>
+						</ns2:Slot>
+						<ns2:Slot name="serviceStopTime">
+							<ns2:ValueList>
+								<ns2:Value>20170531140000</ns2:Value>
+							</ns2:ValueList>
+						</ns2:Slot>
+						<ns2:Slot name="sourcePatientId">
+							<ns2:ValueList>
+								<ns2:Value>ABCDEFGHIJ^^^&amp;1.2.208.176.1.2&amp;ISO</ns2:Value>
+							</ns2:ValueList>
+						</ns2:Slot>
+						<ns2:Name>
+							<ns2:LocalizedString xml:lang="en-US"
+								charset="UTF-8" value="Aftale for ABCDEFGHIJ" />
+						</ns2:Name>
+						<ns2:Classification
+							classificationScheme="urn:uuid:93606bcf-9494-43ec-9b4e-a7748d1a838d"
+							classifiedObject="9094771191499430498.3850557330642522022.1506062798700"
+							nodeRepresentation=""
+							id="urn:uuid:7cba288c-a64f-4993-a2a3-d8ff153b9cce">
+							<ns2:Slot name="authorInstitution">
+								<ns2:ValueList>
+									<ns2:Value>OUH Radiologisk Afdeling
+										(Svendborg)^^^^^&amp;1.2.208.176.1.1&amp;ISO^^^^242621000016001</ns2:Value>
+								</ns2:ValueList>
+							</ns2:Slot>
+						</ns2:Classification>
+						<ns2:Classification
+							classificationScheme="urn:uuid:41a5887f-8865-4c09-adf7-e362475b143a"
+							classifiedObject="9094771191499430498.3850557330642522022.1506062798700"
+							nodeRepresentation="001"
+							id="urn:uuid:bed24d4e-f707-4307-a4d1-83bf879ae903">
+							<ns2:Slot name="codingScheme">
+								<ns2:ValueList>
+									<ns2:Value>1.2.208.184.100.9</ns2:Value>
+								</ns2:ValueList>
+							</ns2:Slot>
+							<ns2:Name>
+								<ns2:LocalizedString xml:lang="en-US"
+									charset="UTF-8" value="Klinisk rapport" />
+							</ns2:Name>
+						</ns2:Classification>
+						<ns2:Classification
+							classificationScheme="urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d"
+							classifiedObject="9094771191499430498.3850557330642522022.1506062798700"
+							nodeRepresentation="urn:ad:dk:medcom:appointment"
+							id="urn:uuid:6ab11727-4ad5-4e29-89a4-bd6e01a78087">
+							<ns2:Slot name="codingScheme">
+								<ns2:ValueList>
+									<ns2:Value>1.2.208.184.14.1</ns2:Value>
+								</ns2:ValueList>
+							</ns2:Slot>
+							<ns2:Name>
+								<ns2:LocalizedString xml:lang="en-US"
+									charset="UTF-8" value="DK CDA APD" />
+							</ns2:Name>
+						</ns2:Classification>
+						<ns2:Classification
+							classificationScheme="urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1"
+							classifiedObject="9094771191499430498.3850557330642522022.1506062798700"
+							nodeRepresentation="22232009"
+							id="urn:uuid:44b434b4-3a34-42da-aac9-f31d930aa174">
+							<ns2:Slot name="codingScheme">
+								<ns2:ValueList>
+									<ns2:Value>2.16.840.1.113883.6.96</ns2:Value>
+								</ns2:ValueList>
+							</ns2:Slot>
+							<ns2:Name>
+								<ns2:LocalizedString xml:lang="en-US"
+									charset="UTF-8" value="hospital" />
+							</ns2:Name>
+						</ns2:Classification>
+						<ns2:Classification
+							classificationScheme="urn:uuid:cccf5598-8b07-4b77-a05e-ae952c785ead"
+							classifiedObject="9094771191499430498.3850557330642522022.1506062798700"
+							nodeRepresentation="408443003"
+							id="urn:uuid:b378bd53-c6f1-4ad0-81ff-48c59ee85ec3">
+							<ns2:Slot name="codingScheme">
+								<ns2:ValueList>
+									<ns2:Value>2.16.840.1.113883.6.96</ns2:Value>
+								</ns2:ValueList>
+							</ns2:Slot>
+							<ns2:Name>
+								<ns2:LocalizedString xml:lang="en-US"
+									charset="UTF-8" value="almen medicin" />
+							</ns2:Name>
+						</ns2:Classification>
+						<ns2:Classification
+							classificationScheme="urn:uuid:f0306f51-975f-434e-a61c-c59651d33983"
+							classifiedObject="9094771191499430498.3850557330642522022.1506062798700"
+							nodeRepresentation="39289-4"
+							id="urn:uuid:98c6a1a1-4e10-499f-b0ea-ce77469104cb">
+							<ns2:Slot name="codingScheme">
+								<ns2:ValueList>
+									<ns2:Value>2.16.840.1.113883.6.1</ns2:Value>
+								</ns2:ValueList>
+							</ns2:Slot>
+							<ns2:Name>
+								<ns2:LocalizedString xml:lang="en-US"
+									charset="UTF-8"
+									value="Dato og tidspunkt for møde mellem patient og sundhedsperson" />
+							</ns2:Name>
+						</ns2:Classification>
+						<ns2:ExternalIdentifier
+							registryObject="9094771191499430498.3850557330642522022.1506062798700"
+							identificationScheme="urn:uuid:58a6f841-87b3-4a3e-92fd-a8ffeff98427"
+							value="ABCDEFGHIJ^^^&amp;1.2.208.176.1.2&amp;ISO" id="urn:uuid:c2c792f0-0140-47ec-ad86-f9b31d1e11bf">
+							<ns2:Name>
+								<ns2:LocalizedString value="XDSDocumentEntry.patientId" />
+							</ns2:Name>
+						</ns2:ExternalIdentifier>
+						<ns2:ExternalIdentifier
+							registryObject="9094771191499430498.3850557330642522022.1506062798700"
+							identificationScheme="urn:uuid:2e82c1f6-a085-4c72-9da3-8640a32e42ab"
+							value="5799192057634222877.2039431342974219681.1506062798700" id="urn:uuid:090406ea-dd31-4f08-864f-fd50e65da7c0">
+							<ns2:Name>
+								<ns2:LocalizedString value="XDSDocumentEntry.uniqueId" />
+							</ns2:Name>
+						</ns2:ExternalIdentifier>
+					</ns2:ExtrinsicObject>
+					<ns2:RegistryPackage
+						status="urn:oasis:names:tc:ebxml-regrep:StatusType:Approved" id="7547569023772453264.3042003444609663692.1506062798701">
+						<ns2:Slot name="submissionTime">
+							<ns2:ValueList>
+								<ns2:Value>20170113100000</ns2:Value>
+							</ns2:ValueList>
+						</ns2:Slot>
+						<ns2:Classification
+							classificationScheme="urn:uuid:aa543740-bdda-424e-8c96-df4873be8500"
+							classifiedObject="7547569023772453264.3042003444609663692.1506062798701"
+							nodeRepresentation="39289-4"
+							id="urn:uuid:95610c94-b60f-48c0-bada-087fef501f0f">
+							<ns2:Slot name="codingScheme">
+								<ns2:ValueList>
+									<ns2:Value>2.16.840.1.113883.6.1</ns2:Value>
+								</ns2:ValueList>
+							</ns2:Slot>
+							<ns2:Name>
+								<ns2:LocalizedString xml:lang="en-US"
+									charset="UTF-8"
+									value="Dato og tidspunkt for møde mellem patient og sundhedsperson" />
+							</ns2:Name>
+						</ns2:Classification>
+						<ns2:ExternalIdentifier
+							registryObject="7547569023772453264.3042003444609663692.1506062798701"
+							identificationScheme="urn:uuid:6b5aea1a-874d-4603-a4bc-96a0a7b38446"
+							value="ABCDEFGHIJ^^^&amp;1.2.208.176.1.2&amp;ISO" id="urn:uuid:45911ec5-6382-4831-b1d9-fca48f84a25c">
+							<ns2:Name>
+								<ns2:LocalizedString value="XDSSubmissionSet.patientId" />
+							</ns2:Name>
+						</ns2:ExternalIdentifier>
+						<ns2:ExternalIdentifier
+							registryObject="7547569023772453264.3042003444609663692.1506062798701"
+							identificationScheme="urn:uuid:96fdda7c-d067-4183-912e-bf5ee74998a8"
+							value="7547569023772453264.3042003444609663692.1506062798701" id="urn:uuid:8b731406-0909-41fe-b1e0-6e2e39233ba8">
+							<ns2:Name>
+								<ns2:LocalizedString value="XDSSubmissionSet.uniqueId" />
+							</ns2:Name>
+						</ns2:ExternalIdentifier>
+						<ns2:ExternalIdentifier
+							registryObject="7547569023772453264.3042003444609663692.1506062798701"
+							identificationScheme="urn:uuid:554ac39e-e3fe-47fe-b233-965d2a147832"
+							value="7547569023772453264.3042003444609663692.1506062798701" id="urn:uuid:ced674d9-f557-45bc-99fd-ddc586a69f0a">
+							<ns2:Name>
+								<ns2:LocalizedString value="XDSSubmissionSet.sourceId" />
+							</ns2:Name>
+						</ns2:ExternalIdentifier>
+					</ns2:RegistryPackage>
+					<ns2:Classification
+						classifiedObject="7547569023772453264.3042003444609663692.1506062798701"
+						classificationNode="urn:uuid:a54d6aa5-d40d-43f9-88c5-b4633d873bdd"
+						id="urn:uuid:4059386f-4e96-436e-b69c-2664d791f887" />
+					<ns2:Association
+						associationType="urn:oasis:names:tc:ebxml-regrep:AssociationType:HasMember"
+						sourceObject="7547569023772453264.3042003444609663692.1506062798701"
+						targetObject="9094771191499430498.3850557330642522022.1506062798700"
+						status="urn:oasis:names:tc:ebxml-regrep:StatusType:Approved" id="6395057452490673283.7106603402464740468.1506062798702">
+						<ns2:Slot name="SubmissionSetStatus">
+							<ns2:ValueList>
+								<ns2:Value>Original</ns2:Value>
+							</ns2:ValueList>
+						</ns2:Slot>
+					</ns2:Association>
+					<ns2:Association associationType="urn:ihe:iti:2007:AssociationType:RPLC"
+						sourceObject="9094771191499430498.3850557330642522022.1506062798700"
+						targetObject="urn:uuid:4016976a-8b7c-4410-9d3b-c8ef081fca1d"
+						id="7905419937390759932.1551521570726037843.1506062798703" />
+				</ns2:RegistryObjectList>
+			</ns5:SubmitObjectsRequest>
+			<ns4:Document id="9094771191499430498.3850557330642522022.1506062798700">
+				<xop:Include xmlns:xop="http://www.w3.org/2004/08/xop/include"
+					href="cid:3c1b452c-4470-432a-a3b0-10d290067d6c-2@urn%3Aihe%3Aiti%3Axds-b%3A2007" />
+			</ns4:Document>
+		</ns4:ProvideAndRegisterDocumentSetRequest>
+	</soap:Body>
+</soap:Envelope>
+--uuid:30789179-359b-4770-993d-b42c11d5f0c3
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: binary
+Content-ID: <3c1b452c-4470-432a-a3b0-10d290067d6c-2@urn:ihe:iti:xds-b:2007>
+
+<ClinicalDocument xmlns="urn:hl7-org:v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" classCode="DOCCLIN" moodCode="EVN" xsi:schemaLocation="urn:hl7-org:v3 ../../PHMR/Schema/CDA_SDTC.xsd">
+	<realmCode code="DK"/>
+	<typeId extension="POCD_HD000040" root="2.16.840.1.113883.1.3"/>
+	<!-- MedCom DK CDA APD profile OID -->
+	<templateId root="1.2.208.184.14.1"/>
+	<id assigningAuthorityName="MedCom" extension="aa2386d0-79ea-11e3-981f-0800200c9a66" root="1.2.208.184"/>
+	<!-- LOINC code for appointment date -->
+	<code code="39289-4" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Dato og tidspunkt for møde mellem patient og sundhedsperson"/>
+	<!-- title = "Aftale for" + patient id -->
+	<title>Aftale for 2512489996</title>
+	<effectiveTime value="20170113100000+0100"/>
+	<confidentialityCode code="N" codeSystem="2.16.840.1.113883.5.25"/>
+	<languageCode code="da-DK"/>
+
+	<!-- information about the patient -->
+	<recordTarget contextControlCode="OP" typeCode="RCT">
+		<patientRole classCode="PAT">
+			<id assigningAuthorityName="CPR" extension="2512489996" root="1.2.208.176.1.2"/>
+			<addr use="H">
+				<streetAddressLine>Skovvejen 12</streetAddressLine>
+				<streetAddressLine>Landet</streetAddressLine>
+				<postalCode>5700</postalCode>
+				<city>Svendborg</city>
+				<country>Danmark</country>
+			</addr>
+			<telecom use="H" value="tel:65123456"/>
+			<telecom use="WP" value="mailto:nab@udkantsdanmark.dk"/>
+			<patient classCode="PSN" determinerCode="INSTANCE">
+				<name>
+					<given>Nancy</given>
+					<given>Ann</given>
+					<family>Berggren</family>
+				</name>
+				<administrativeGenderCode code="F" codeSystem="2.16.840.1.113883.5.1"/>
+				<birthTime value="19481225000000+0000"/>
+			</patient>
+		</patientRole>
+	</recordTarget>
+
+	<!-- the health care organisation and person responsible for the appointment -->
+	<author contextControlCode="OP" typeCode="AUT">
+		<time value="20170216100000+0100"/>
+		<assignedAuthor classCode="ASSIGNED">
+			<id assigningAuthorityName="SOR" extension="242621000016001" root="1.2.208.176.1.1"/>
+			<addr use="WP">
+				<streetAddressLine>Valdemarsgade 53</streetAddressLine>
+				<postalCode>5700</postalCode>
+				<city>Svendborg</city>
+				<country>Danmark</country>
+			</addr>
+			<telecom use="WP" value="tel:65113333-1"/>
+			<assignedPerson classCode="PSN" determinerCode="INSTANCE">
+				<name>
+					<prefix>Læge</prefix>
+					<given>Jens</given>
+					<family>Jensen</family>
+				</name>
+			</assignedPerson>
+			<representedOrganization classCode="ORG" determinerCode="INSTANCE">
+				<name>OUH Radiologisk Afdeling (Svendborg)</name>
+				<telecom nullFlavor="NI"/>
+				<addr use="WP">
+					<streetAddressLine nullFlavor="NI"/>
+				</addr>
+			</representedOrganization>
+		</assignedAuthor>
+	</author>
+
+	<!-- the organisation responsible for maintaing the CDA document -->
+	<custodian typeCode="CST">
+		<assignedCustodian classCode="ASSIGNED">
+			<representedCustodianOrganization classCode="ORG" determinerCode="INSTANCE">
+				<id assigningAuthorityName="SOR" extension="515361000016007" root="1.2.208.176.1.1"/>
+				<name>OUH Klinisk IT (Odense)</name>
+				<telecom use="WP" value="tel:66113333-2"/>
+				<addr use="WP">
+					<streetAddressLine>J. B. Winsløwsvej 4 1</streetAddressLine>
+					<postalCode>5000</postalCode>
+					<city>Odense C</city>
+					<country>Danmark</country>
+				</addr>
+			</representedCustodianOrganization>
+		</assignedCustodian>
+	</custodian>
+
+	<!-- the date and time for when the service event will take place -->
+	<documentationOf typeCode="DOC">
+		<serviceEvent classCode="MPROT" moodCode="EVN">
+			<effectiveTime>
+				<low value="20170531120000+0100"/>
+				<high value="20170531130000+0100"/>
+			</effectiveTime>
+		</serviceEvent>
+	</documentationOf>
+
+	<!-- CDA Body -->
+	<component contextConductionInd="true" typeCode="COMP">
+		<structuredBody classCode="DOCBODY" moodCode="EVN">
+
+			<component contextConductionInd="true" typeCode="COMP">
+
+				<section classCode="DOCSECT" moodCode="EVN">
+					<!-- DK APD Plan of treatment section template -->
+					<templateId extension="2017-03-10" root="1.2.208.184.14.11.1"/>
+					<code code="18776-5" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Plan of care note"/>
+					<title>Aftale</title>
+					<text>
+						<paragraph>Aftale:</paragraph>
+						<table width="100%">
+							<tbody>
+								<tr>
+									<th>Status</th>
+									<th>Aftale dato</th>
+									<th>Vedrørende</th>
+									<th>Mødested</th>
+								</tr>
+								<tr>
+									<td>active</td>
+									<td>2017-05-31 11:00 - 2017-05-31 11:20</td>
+									<td>Ekkokardiografi (Ultralydsundersøgelse af hjertet)</td>
+									<td>Vestergade 17, 5800 Nyborg</td>
+								</tr>
+							</tbody>
+						</table>
+					</text>
+
+					<entry>
+						<encounter classCode="ENC" moodCode="APT">
+							<!-- DK APD Planned Encounter template -->
+							<templateId extension="2017-03-10" root="1.2.208.184.14.11.2"/>
+
+							<id assigningAuthorityName="MedCom" extension="9a6d1bac-17d3-4195-89a4-1121bc809b4d" root="1.2.208.184"/>
+							<code code="185353001" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT" displayName="Aftale dato">
+							</code>
+							<statusCode code="active"/>
+
+							<!-- time period for the planned health care service -->
+							<effectiveTime>
+								<low value="20170531120000+0100"/>
+								<high value="20170531130000+0100"/>
+							</effectiveTime>
+
+							<!-- responsible organisation/person for the health care service -->
+							<performer typeCode="PRF">
+								<assignedEntity classCode="ASSIGNED">
+									<id assigningAuthorityName="SOR" extension="320161000016005" root="1.2.208.176.1.1"/>
+									<addr use="WP">
+										<streetAddressLine>Valdemarsgade 53</streetAddressLine>
+										<postalCode>5700</postalCode>
+										<city>Svendborg</city>
+										<country>Danmark</country>
+									</addr>
+									<telecom use="WP" value="tel:66113333-3"/>
+									<assignedPerson classCode="PSN" determinerCode="INSTANCE">
+										<name>
+											<prefix>Læge</prefix>
+											<given>Anders</given>
+											<family>Andersen</family>
+										</name>
+									</assignedPerson>
+									<representedOrganization classCode="ORG" determinerCode="INSTANCE">
+										<name>OUH Radiologisk Ambulatorium (Nyborg)</name>
+										<telecom nullFlavor="NI"/>
+										<addr use="WP">
+											<streetAddressLine nullFlavor="NI"/>
+										</addr>
+									</representedOrganization>
+								</assignedEntity>
+							</performer>
+
+							<!-- organisation/person who are requesting the appointment (placer) -->
+							<author contextControlCode="OP" typeCode="AUT">
+								<time value="20170216100000+0100"/>
+								<assignedAuthor classCode="ASSIGNED">
+									<id assigningAuthorityName="SOR" extension="48681000016007" root="1.2.208.176.1.1"/>
+									<addr use="WP">
+										<streetAddressLine>Toldbodvej 9</streetAddressLine>
+										<postalCode>5700</postalCode>
+										<city>Svendborg</city>
+										<country>Danmark</country>
+									</addr>
+									<telecom use="WP" value="tel:62214518"/>
+									<assignedPerson classCode="PSN" determinerCode="INSTANCE">
+										<name>
+											<given>Anders</given>
+											<family>Andersen</family>
+										</name>
+									</assignedPerson>
+									<representedOrganization classCode="ORG" determinerCode="INSTANCE">
+										<name>Lægerne Toldbodvej</name>
+										<telecom nullFlavor="NI"/>
+										<addr use="WP">
+											<streetAddressLine nullFlavor="NI"/>
+										</addr>
+									</representedOrganization>
+								</assignedAuthor>
+							</author>
+
+							<!-- location for the planned health care service -->
+							<participant typeCode="LOC">
+								<participantRole classCode="SDLOC">
+									<!-- DK Service Delivery Location template -->
+									<templateId extension="2017-03-10" root="1.2.208.184.14.11.3"/>
+									<id assigningAuthorityName="SOR" extension="320161000016005" root="1.2.208.176.1.1"/>
+									<addr use="WP">
+										<streetAddressLine>Østergade 19</streetAddressLine>
+										<postalCode>5800</postalCode>
+										<city>Nyborg</city>
+										<country>Danmark</country>
+									</addr>
+									<telecom use="WP" value="tel:66113333-4"/>
+									<playingEntity classCode="PLC">
+										<name>OUH Radiologisk Ambulatorium (Nyborg)</name>
+									</playingEntity>
+								</participantRole>
+							</participant>
+
+							<!-- reason for the planned health care service -->
+							<entryRelationship typeCode="RSON">
+								<observation classCode="OBS" moodCode="RQO">
+									<code code="NI" displayName="Ekkokardiografi (Ultralydsundersøgelse af hjertet)"/>
+								</observation>
+							</entryRelationship>
+						</encounter>
+					</entry>
+
+				</section>
+
+			</component>
+
+		</structuredBody>
+	</component>
+</ClinicalDocument>
+--uuid:30789179-359b-4770-993d-b42c11d5f0c3--

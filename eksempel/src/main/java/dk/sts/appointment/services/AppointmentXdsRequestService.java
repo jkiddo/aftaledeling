@@ -60,6 +60,9 @@ public class AppointmentXdsRequestService {
 	public List<DocumentEntry> getAllAppointmentsForPatient(String citizenId) throws XdsException {
 		return getAppointmentsForPatient(citizenId, null, null);
 	}
+	public List<DocumentEntry> getAllAppointmentsForPatient(String citizenId, Date start, Date end) throws XdsException {
+		return getAppointmentsForPatient(citizenId, start, end);
+	}
 	
 	public List<DocumentEntry> getAppointmentsForPatient(String citizenId, Date start, Date end) throws XdsException {
 		List<Code> typeCodes = new ArrayList<Code>();
@@ -114,6 +117,21 @@ public class AppointmentXdsRequestService {
 			throw e;
 		}
 	}	
+
+	
+	public String createAndRegisterDocumentAsReplacement(String externalIdForUpdatedDocument, String updatedAppointmentXmlDocument, DocumentMetadata updatedAppointmentCdaMetadata, String externalIdForDocumentToReplace) throws XdsException {
+		ProvideAndRegisterDocumentSetRequestType provideAndRegisterDocumentSetRequest = appointmentXdsRequestBuilderService.buildProvideAndRegisterDocumentSetRequestWithReplacement(externalIdForUpdatedDocument, updatedAppointmentXmlDocument, updatedAppointmentCdaMetadata, externalIdForDocumentToReplace);
+		RegistryResponseType registryResponse = iti41PortType.documentRepositoryProvideAndRegisterDocumentSetB(provideAndRegisterDocumentSetRequest);
+		if (registryResponse.getRegistryErrorList() == null || registryResponse.getRegistryErrorList().getRegistryError() == null || registryResponse.getRegistryErrorList().getRegistryError().isEmpty()) {
+			return externalIdForUpdatedDocument;
+		} else {
+			XdsException e = new XdsException();
+			for (RegistryError registryError :registryResponse.getRegistryErrorList().getRegistryError()) {
+				e.addError(registryError.getCodeContext());
+			}
+			throw e;
+		}
+	}
 
 		
 	public String createAndRegisterDocument(String externalId, String document, DocumentMetadata documentMetadata) throws XdsException {

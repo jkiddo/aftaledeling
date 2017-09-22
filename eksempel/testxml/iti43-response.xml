@@ -1,8 +1,38 @@
-<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"><soap:Header><Action xmlns="http://www.w3.org/2005/08/addressing">urn:ihe:iti:2007:RetrieveDocumentSetResponse</Action><MessageID xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:96ef25a3-50dc-41c7-b6f5-5602d66c7b3f</MessageID><To xmlns="http://www.w3.org/2005/08/addressing">http://www.w3.org/2005/08/addressing/anonymous</To><RelatesTo xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:fb6975fd-603a-426b-85b1-26732fa41551</RelatesTo></soap:Header><soap:Body><ns2:RetrieveDocumentSetResponse xmlns:ns6="urn:oasis:names:tc:ebxml-regrep:xsd:lcm:3.0" xmlns:ns5="urn:oasis:names:tc:ebxml-regrep:xsd:query:3.0" xmlns:ns4="urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0" xmlns:ns3="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0" xmlns:ns2="urn:ihe:iti:xds-b:2007"><ns4:RegistryResponse status="urn:oasis:names:tc:ebxml-regrep:ResponseStatusType:Success"/><ns2:DocumentResponse><ns2:RepositoryUniqueId>1.2.208.176.43210.8.88.1.30</ns2:RepositoryUniqueId><ns2:DocumentUniqueId>4619091542759068279.4584476099589391958.1506000680164</ns2:DocumentUniqueId><ns2:mimeType>application/octet-stream</ns2:mimeType><ns2:Document><xop:Include xmlns:xop="http://www.w3.org/2004/08/xop/include" href="cid:1359d532-db53-492b-8df6-636a91a313d0-1543@urn%3Aihe%3Aiti%3Axds-b%3A2007"/></ns2:Document></ns2:DocumentResponse></ns2:RetrieveDocumentSetResponse></soap:Body></soap:Envelope>
---uuid:a4881dce-4ed2-42ee-9436-65e30b2984bb
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+	<soap:Header>
+		<Action xmlns="http://www.w3.org/2005/08/addressing">urn:ihe:iti:2007:RetrieveDocumentSetResponse
+		</Action>
+		<MessageID xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:e3640033-b5e1-4572-a376-cf733aa27cb9
+		</MessageID>
+		<To xmlns="http://www.w3.org/2005/08/addressing">http://www.w3.org/2005/08/addressing/anonymous</To>
+		<RelatesTo xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:96068af0-f469-47f9-8db5-91b568229f8f
+		</RelatesTo>
+	</soap:Header>
+	<soap:Body>
+		<ns2:RetrieveDocumentSetResponse
+			xmlns:ns6="urn:oasis:names:tc:ebxml-regrep:xsd:lcm:3.0" xmlns:ns5="urn:oasis:names:tc:ebxml-regrep:xsd:query:3.0"
+			xmlns:ns4="urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0" xmlns:ns3="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0"
+			xmlns:ns2="urn:ihe:iti:xds-b:2007">
+			<ns4:RegistryResponse
+				status="urn:oasis:names:tc:ebxml-regrep:ResponseStatusType:Success" />
+			<ns2:DocumentResponse>
+				<ns2:RepositoryUniqueId>1.2.208.176.43210.8.88.1.30
+				</ns2:RepositoryUniqueId>
+				<ns2:DocumentUniqueId>8259842395306321041.4480078910598656356.1506062797976
+				</ns2:DocumentUniqueId>
+				<ns2:mimeType>application/octet-stream</ns2:mimeType>
+				<ns2:Document>
+					<xop:Include xmlns:xop="http://www.w3.org/2004/08/xop/include"
+						href="cid:1359d532-db53-492b-8df6-636a91a313d0-1565@urn%3Aihe%3Aiti%3Axds-b%3A2007" />
+				</ns2:Document>
+			</ns2:DocumentResponse>
+		</ns2:RetrieveDocumentSetResponse>
+	</soap:Body>
+</soap:Envelope>
+--uuid:fdc4294c-abe2-4f98-9438-3c2858209f39
 Content-Type: application/octet-stream
 Content-Transfer-Encoding: binary
-Content-ID: <1359d532-db53-492b-8df6-636a91a313d0-1543@urn:ihe:iti:xds-b:2007>
+Content-ID: <1359d532-db53-492b-8df6-636a91a313d0-1565@urn:ihe:iti:xds-b:2007>
 
 <ClinicalDocument xmlns="urn:hl7-org:v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" classCode="DOCCLIN" moodCode="EVN" xsi:schemaLocation="urn:hl7-org:v3 ../../PHMR/Schema/CDA_SDTC.xsd">
   <realmCode code="DK"/>
@@ -237,4 +267,4 @@ Content-ID: <1359d532-db53-492b-8df6-636a91a313d0-1543@urn:ihe:iti:xds-b:2007>
     </structuredBody>
   </component>
 </ClinicalDocument>
---uuid:a4881dce-4ed2-42ee-9436-65e30b2984bb--
+--uuid:fdc4294c-abe2-4f98-9438-3c2858209f39--
