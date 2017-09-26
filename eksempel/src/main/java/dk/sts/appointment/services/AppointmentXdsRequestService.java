@@ -9,6 +9,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.openehealth.ipf.commons.ihe.xds.core.ebxml.EbXMLFactory;
 import org.openehealth.ipf.commons.ihe.xds.core.ebxml.ebxml30.EbXMLFactory30;
 import org.openehealth.ipf.commons.ihe.xds.core.ebxml.ebxml30.EbXMLQueryResponse30;
@@ -168,4 +172,29 @@ public class AppointmentXdsRequestService {
 			throw e;
 		}
 	}
+	
+	public void addOutInterceptors(AbstractPhaseInterceptor<Message> interceptor) {		
+		addOutInterceptor(iti18PortType, interceptor);
+		addOutInterceptor(iti41PortType, interceptor);		
+		addOutInterceptor(iti43PortType, interceptor);
+		addOutInterceptor(iti57PortType, interceptor);
+	}
+	
+	private void addOutInterceptor(Object o, AbstractPhaseInterceptor<Message> interceptor) {
+		Client proxy = ClientProxy.getClient(o);
+		proxy.getOutInterceptors().add(interceptor);
+	}
+	
+	public void addInInterceptors(AbstractPhaseInterceptor<Message> interceptor) {		
+		addInInterceptor(iti18PortType, interceptor);
+		addInInterceptor(iti41PortType, interceptor);		
+		addInInterceptor(iti43PortType, interceptor);
+		addInInterceptor(iti57PortType, interceptor);
+	}
+	
+	private void addInInterceptor(Object o, AbstractPhaseInterceptor<Message> interceptor) {
+		Client proxy = ClientProxy.getClient(o);
+		proxy.getInInterceptors().add(interceptor);
+	}
+	
 }
