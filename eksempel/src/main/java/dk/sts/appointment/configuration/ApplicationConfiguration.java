@@ -1,11 +1,17 @@
 package dk.sts.appointment.configuration;
 
+import java.security.cert.X509Certificate;
+
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.transport.http.HTTPConduit;
 import org.openehealth.ipf.commons.ihe.ws.WsTransactionConfiguration;
 import org.openehealth.ipf.commons.ihe.xds.core.XdsClientFactory;
 import org.openehealth.ipf.commons.ihe.xds.iti18.Iti18PortType;
@@ -29,6 +35,19 @@ public class ApplicationConfiguration {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(ApplicationConfiguration.class);
 
+	private TrustManager[] trustAllCerts = new TrustManager[] {
+		       new X509TrustManager() {
+		          public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+		            return null;
+		          }
+
+		          public void checkClientTrusted(X509Certificate[] certs, String authType) {  }
+
+		          public void checkServerTrusted(X509Certificate[] certs, String authType) {  }
+
+		       }
+		    };
+	
 	@Value("${xds.iti18.endpoint}")
 	String xdsIti18Endpoint;
 
@@ -66,11 +85,7 @@ public class ApplicationConfiguration {
 		XdsClientFactory xdsClientFactory = generateXdsRegistryClientFactory(xdsIti18Wsdl, xdsIti18Endpoint, Iti18PortType.class);
 		Iti18PortType client = (Iti18PortType) xdsClientFactory.getClient();
 
-		if (LOGGER.isDebugEnabled()) {
-			Client proxy = ClientProxy.getClient(client);
-			proxy.getOutInterceptors().add(new LoggingOutInterceptor());
-			proxy.getInInterceptors().add(new LoggingInInterceptor());
-		}	
+		initProxy(client);	
 
 		return client;
 	}
@@ -82,11 +97,7 @@ public class ApplicationConfiguration {
 		XdsClientFactory xdsClientFactory = generateXdsRepositoryClientFactory(xdsIti41Wsdl, xdsIti41Endpoint, Iti41PortType.class);
 		Iti41PortType client = (Iti41PortType) xdsClientFactory.getClient();
 
-		if (LOGGER.isDebugEnabled()) {
-			Client proxy = ClientProxy.getClient(client);
-			proxy.getOutInterceptors().add(new LoggingOutInterceptor());
-			proxy.getInInterceptors().add(new LoggingInInterceptor());
-		}
+		initProxy(client);	
 
 		return client;
 	}
@@ -98,11 +109,8 @@ public class ApplicationConfiguration {
 
 		XdsClientFactory xdsClientFactory = generateXdsRepositoryClientFactory(xdsIti43Wsdl, xdsIti43Endpoint, Iti43PortType.class);
 		Iti43PortType client = (Iti43PortType) xdsClientFactory.getClient();
-		if (LOGGER.isDebugEnabled()) {
-			Client proxy = ClientProxy.getClient(client);
-			proxy.getOutInterceptors().add(new LoggingOutInterceptor());
-			proxy.getInInterceptors().add(new LoggingInInterceptor());
-		}
+		
+		initProxy(client);	
 
 		return client;
 	}
@@ -115,11 +123,7 @@ public class ApplicationConfiguration {
 		XdsClientFactory xdsClientFactory = generateXdsRegistryClientFactory("urn:ihe:iti:xds-b:2010", xdsIti57Wsdl, xdsIti57Endpoint, Iti57PortType.class);
 		Iti57PortType client = (Iti57PortType) xdsClientFactory.getClient();
 
-		if (LOGGER.isDebugEnabled()) {
-			Client proxy = ClientProxy.getClient(client);
-			proxy.getOutInterceptors().add(new LoggingOutInterceptor());
-			proxy.getInInterceptors().add(new LoggingInInterceptor());
-		}
+		initProxy(client);	
 
 		return client;
 	}
@@ -148,6 +152,19 @@ public class ApplicationConfiguration {
 				wsdl, true, false, false, false);
 
 		return new XdsClientFactory(WS_CONFIG, url, null, null,null);
+	}
+	
+	private void initProxy(Object o) {
+		
+		Client proxy = ClientProxy.getClient(o);		
+		if (LOGGER.isDebugEnabled()) {
+			proxy.getOutInterceptors().add(new LoggingOutInterceptor());
+			proxy.getInInterceptors().add(new LoggingInInterceptor());
+		}	
+		HTTPConduit conduit = (HTTPConduit)proxy.getConduit();
+		TLSClientParameters tcp = new TLSClientParameters();
+		tcp.setTrustManagers(trustAllCerts);
+		conduit.setTlsClientParameters(tcp);
 	}
 
 	@Bean
