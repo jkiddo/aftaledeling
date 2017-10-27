@@ -33,12 +33,13 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import dk.sts.appointment.configuration.ApplicationConfiguration;
+import dk.sts.appointment.configuration.DgwsConfiguration;
 import dk.sts.appointment.dto.DocumentMetadata;
 import dk.sts.appointment.services.AppointmentXdsRequestService;
 import dk.sts.appointment.utilities.Codes;
 
 
-@Import(ApplicationConfiguration.class)
+@Import({ApplicationConfiguration.class, DgwsConfiguration.class})
 @EnableAutoConfiguration
 public class Application implements CommandLineRunner {
 
@@ -62,8 +63,8 @@ public class Application implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 
 		// Search documents for patient
-		List<DocumentEntry> currentAppointments = appointmentXdsRequestService.getAllAppointmentsForPatient(PATIENT_ID);
-		System.out.println("The patient with id="+PATIENT_ID+" has "+currentAppointments.size()+" registered in the XDS registry.");
+	//	List<DocumentEntry> currentAppointments = appointmentXdsRequestService.getAllAppointmentsForPatient(PATIENT_ID);
+		//System.out.println("The patient with id="+PATIENT_ID+" has "+currentAppointments.size()+" registered in the XDS registry.");
 
 		// Register appointment (data extracted from the example file)
 		String appointmentXmlDocument = getXmlFileContent("/DK-APD_Example_1.xml");

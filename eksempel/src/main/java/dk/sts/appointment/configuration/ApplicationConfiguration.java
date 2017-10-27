@@ -76,7 +76,6 @@ public class ApplicationConfiguration {
 	}
 
 	@Bean
-	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public Iti41PortType getDocumentRepositoryServiceIti41() {
 		LOGGER.info("Creating Iti41PortType for url: "+xdsIti41Endpoint);
 
