@@ -8,7 +8,10 @@ import javax.annotation.PostConstruct;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.openehealth.ipf.commons.ihe.xds.iti18.Iti18PortType;
 import org.openehealth.ipf.commons.ihe.xds.iti41.Iti41PortType;
+import org.openehealth.ipf.commons.ihe.xds.iti43.Iti43PortType;
+import org.openehealth.ipf.commons.ihe.xds.iti57.Iti57PortType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -37,25 +40,37 @@ public class DgwsConfiguration {
 
 	@Value("${keystore.password}")
 	private String keystorePassword;
-	
+
 	@Autowired
 	private ResourceLoader resourceLoader;
 
 	@Autowired
 	private ApplicationContext appContext;
-	
+
 	@PostConstruct 
 	public void init() {
 		// The SOSI Seal Library reads the alias value using System.getProperty()
 		System.setProperty("dk.sosi.seal.vault.CredentialVault#Alias", keystoreAlias);
-		
-		Iti41PortType iti41 = appContext.getBean(Iti41PortType.class);
-		DgwsSoapDecorator dgws = appContext.getBean(DgwsSoapDecorator.class);
+		DgwsSoapDecorator dgwsSoapDecorator = appContext.getBean(DgwsSoapDecorator.class);
 
-		Client proxy = ClientProxy.getClient(iti41);
-		proxy.getOutInterceptors().add(dgws);
+		// Add DGWS decorator to all ITI beans
+		Iti41PortType iti41 = appContext.getBean(Iti41PortType.class);
+		Client proxy41 = ClientProxy.getClient(iti41);
+		proxy41.getOutInterceptors().add(dgwsSoapDecorator);
+		
+		Iti43PortType iti43 = appContext.getBean(Iti43PortType.class);
+		Client proxy43 = ClientProxy.getClient(iti43);
+		proxy43.getOutInterceptors().add(dgwsSoapDecorator);
+
+		Iti18PortType iti18 = appContext.getBean(Iti18PortType.class);
+		Client proxy18 = ClientProxy.getClient(iti18);
+		proxy18.getOutInterceptors().add(dgwsSoapDecorator);
+
+		Iti57PortType iti57 = appContext.getBean(Iti57PortType.class);
+		Client proxy57 = ClientProxy.getClient(iti57);
+		proxy57.getOutInterceptors().add(dgwsSoapDecorator);
 	}
-	
+
 	@Bean
 	public DgwsSoapDecorator dgwsSoapDecorator() {
 		return new DgwsSoapDecorator();
@@ -85,7 +100,7 @@ public class DgwsConfiguration {
 		STSRequestHelper requestHelper = new STSRequestHelper();
 		return requestHelper;
 	}
-	
+
 	@Bean(name="dgwsTemplate")
 	public RestTemplate restTemplate() {
 		return new RestTemplate();
