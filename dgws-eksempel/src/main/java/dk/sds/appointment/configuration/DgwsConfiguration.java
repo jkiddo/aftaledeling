@@ -1,4 +1,4 @@
-package dk.sts.appointment.configuration;
+package dk.sds.appointment.configuration;
 
 import java.io.IOException;
 import java.security.cert.CertificateException;
@@ -8,8 +8,6 @@ import javax.annotation.PostConstruct;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.openehealth.ipf.commons.ihe.xds.iti41.Iti41PortType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,13 +18,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.web.client.RestTemplate;
 
+import dk.sds.appointment.dgws.DgwsSoapDecorator;
+import dk.sds.appointment.dgws.STSRequestHelper;
 import dk.sosi.seal.SOSIFactory;
 import dk.sosi.seal.pki.SOSITestFederation;
 import dk.sosi.seal.vault.CredentialVault;
 import dk.sosi.seal.vault.CredentialVaultException;
 import dk.sosi.seal.vault.FileBasedCredentialVault;
-import dk.sts.appointment.dgws.DgwsSoapDecorator;
-import dk.sts.appointment.dgws.STSRequestHelper;
 
 @PropertySource("classpath:dgws.properties")
 public class DgwsConfiguration {
@@ -53,7 +51,7 @@ public class DgwsConfiguration {
 		
 		Iti41PortType iti41 = appContext.getBean(Iti41PortType.class);
 		DgwsSoapDecorator dgws = appContext.getBean(DgwsSoapDecorator.class);
-		
+
 		Client proxy = ClientProxy.getClient(iti41);
 		proxy.getOutInterceptors().add(dgws);
 	}

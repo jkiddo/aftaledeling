@@ -1,4 +1,4 @@
-package dk.sts.appointment.dgws;
+package dk.sds.appointment.dgws;
 
 import java.io.IOException;
 

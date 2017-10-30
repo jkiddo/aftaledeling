@@ -1,4 +1,4 @@
-package dk.sts.appointment.dgws;
+package dk.sds.appointment.dgws;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.headers.Header;
@@ -60,13 +61,23 @@ public class DgwsSoapDecorator extends AbstractSoapInterceptor {
 			Node sosiElement = sosi.getDocumentElement().getFirstChild();
 			Map<String, String> ns = new HashMap<>();
 			collectNameSpaces(sosiElement, ns);
-			String soapenvNs = ns.get("soapenv");
-			ns.put("soapenv", "http://www.w3.org/2003/05/soap-envelope");
+			
+			message.setVersion(Soap11.getInstance());
+			ns.put("ds", "http://www.w3.org/2000/09/xmldsig#");
+			ns.put("medcom","http://www.medcom.dk/dgws/2006/04/dgws-1.0.xsd");
+			ns.put("saml","urn:oasis:names:tc:SAML:2.0:assertion");
+			ns.put("sosi","http://www.sosi.dk/sosi/2006/04/sosi-1.0.xsd");
+			ns.put("wsa","http://schemas.xmlsoap.org/ws/2004/08/addressing");
+			ns.put("wsse","http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd");
+			ns.put("wst", "http://schemas.xmlsoap.org/ws/2005/02/trust");
+			ns.put("wsu","http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
+			ns.put("xsd", "http://www.w3.org/2001/XMLSchema");
+			ns.put("xsi", "http://www.w3.org/2001/XMLSchema-instance");
 			message.put("soap.env.ns.map", ns); 
+			
 			QName qname = new QName(sosiElement.getNamespaceURI(), sosiElement.getLocalName());
 			Header sosiHeader = new Header(qname, sosiElement.getFirstChild());
 			message.getHeaders().add(sosiHeader);
-			// TODO Auto-generated method stub
 		} catch (IOException e) {
 			throw new Fault(e);
 		}

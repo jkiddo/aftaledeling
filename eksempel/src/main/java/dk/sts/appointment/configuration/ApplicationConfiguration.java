@@ -150,8 +150,10 @@ public class ApplicationConfiguration {
 								"urn:ihe:iti:xds-b:2007",
 								"DocumentRepository_Binding_Soap12", "ihe"), true,
 				wsdl, true, false, false, false);
+		
 
-		return new XdsClientFactory(WS_CONFIG, url, null, null,null);
+		XdsClientFactory xcf = new XdsClientFactory(WS_CONFIG, url, null, null,null);
+		return xcf;
 	}
 	
 	private void initProxy(Object o) {
