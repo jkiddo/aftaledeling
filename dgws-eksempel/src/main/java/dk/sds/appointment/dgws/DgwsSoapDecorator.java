@@ -1,7 +1,6 @@
 package dk.sds.appointment.dgws;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -53,37 +52,26 @@ public class DgwsSoapDecorator extends AbstractSoapInterceptor {
 	public DgwsSoapDecorator() {
 		super(Phase.PRE_STREAM);
 	}
-
+	
 	@Override
 	public void handleMessage(SoapMessage message) throws Fault {
 		try {
+			// DGWS is SOAP11
+			message.setVersion(Soap11.getInstance());
+
+			// Add the DGWS headers
 			Document sosi = getSosiDocument();
 			Node sosiElement = sosi.getDocumentElement().getFirstChild();
-			Map<String, String> ns = new HashMap<>();
-			collectNameSpaces(sosiElement, ns);
-			
-			message.setVersion(Soap11.getInstance());
-			ns.put("ds", "http://www.w3.org/2000/09/xmldsig#");
-			ns.put("medcom","http://www.medcom.dk/dgws/2006/04/dgws-1.0.xsd");
-			ns.put("saml","urn:oasis:names:tc:SAML:2.0:assertion");
-			ns.put("sosi","http://www.sosi.dk/sosi/2006/04/sosi-1.0.xsd");
-			ns.put("wsa","http://schemas.xmlsoap.org/ws/2004/08/addressing");
-			ns.put("wsse","http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd");
-			ns.put("wst", "http://schemas.xmlsoap.org/ws/2005/02/trust");
-			ns.put("wsu","http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
-			ns.put("xsd", "http://www.w3.org/2001/XMLSchema");
-			ns.put("xsi", "http://www.w3.org/2001/XMLSchema-instance");
-			message.put("soap.env.ns.map", ns); 
-			
 			QName qname = new QName(sosiElement.getNamespaceURI(), sosiElement.getLocalName());
 			Header sosiHeader = new Header(qname, sosiElement.getFirstChild());
 			message.getHeaders().add(sosiHeader);
+
 		} catch (IOException e) {
 			throw new Fault(e);
 		}
 	}
 
-	
+
 	public static void collectNameSpaces(Node root, Map<String, String> nsMap){
 		String prefix = root.getPrefix();
 		String ns = root.getNamespaceURI();
@@ -97,13 +85,13 @@ public class DgwsSoapDecorator extends AbstractSoapInterceptor {
 			}
 		}
 	}
-	
+
 	private Document getSosiDocument() throws IOException {
 		Request request = sosiFactory.createNewRequest(false, null);
 		request.setIDCard(getToken());
 		return request.serialize2DOMDocument();
 	}
-	
+
 	private IDCard getToken() throws IOException {
 		CareProvider careProvider = new CareProvider(SubjectIdentifierTypeValues.CVR_NUMBER, cvr, orgname);
 		SystemIDCard selfSignedSystemIdCard = sosiFactory.createNewSystemIDCard(itsystem, careProvider, AuthenticationLevel.VOCES_TRUSTED_SYSTEM, null, null, vault.getSystemCredentialPair().getCertificate(), null);
