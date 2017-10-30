@@ -110,25 +110,7 @@
           <code code="18776-5" codeSystem="2.16.840.1.113883.6.1" 
             codeSystemName="LOINC" displayName="Plan of care note" />
           <title>Aftale</title>
-          <text>
-            <paragraph>Aftale:</paragraph>
-            <table width="100%">
-              <tbody>
-                <tr>
-                  <th>Status</th>
-                  <th>Aftale dato</th>
-                  <th>Vedrørende</th>
-                  <th>Mødested</th>
-                </tr>
-                <tr>
-                  <td>active</td>
-                  <td>2017-05-31 11:00 - 2017-05-31 11:20</td>
-                  <td>Ekkokardiografi (Ultralydsundersøgelse af hjertet)</td>
-                  <td>Vestergade 17, 5800 Nyborg</td>
-                </tr>
-              </tbody>
-            </table>
-          </text>
+          <text>Aftale-tekst-her</text>
           
           <entry>
             <encounter moodCode="APT" classCode="ENC">
