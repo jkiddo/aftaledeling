@@ -32,6 +32,8 @@ import org.springframework.context.annotation.Import;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import dk.s4.hl7.cda.convert.APDXmlCodec;
+import dk.s4.hl7.cda.model.apd.AppointmentDocument;
 import dk.sts.appointment.configuration.ApplicationConfiguration;
 import dk.sts.appointment.dto.DocumentMetadata;
 import dk.sts.appointment.services.AppointmentXdsRequestService;
@@ -45,6 +47,8 @@ public class Application implements CommandLineRunner {
 	private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 	
 	private static SimpleDateFormat DATEFORMAT = new SimpleDateFormat("yyyyMMddHHmmssZ");
+	
+	private static APDXmlCodec codec = new APDXmlCodec();
 	
 	@Autowired
 	AppointmentXdsRequestService appointmentXdsRequestService;
@@ -60,19 +64,32 @@ public class Application implements CommandLineRunner {
 	}	
 
 	public void run(String... args) throws Exception {
+		
+		
 
 		// Search documents for patient
 		List<DocumentEntry> currentAppointments = appointmentXdsRequestService.getAllAppointmentsForPatient(PATIENT_ID);
 		System.out.println("The patient with id="+PATIENT_ID+" has "+currentAppointments.size()+" registered in the XDS registry.");
 
 		// Register appointment (data extracted from the example file)
-		String appointmentXmlDocument = getXmlFileContent("/DK-APD_Example_1.xml");
-		String startAppointment = "20170531110000+0100";
-		String endAppointment = "20170531120000+0100";
-		DocumentMetadata appointmentCdaMetadata = createDocumentMetadata(startAppointment, endAppointment);
-				
+		String originalXmlDocument = getXmlFileContent("/DK-APD_Example_1.xml");
+		
+		// read the xml into an appointmentDocument with the parser
+		AppointmentDocument appointmentDocument = codec.decode(originalXmlDocument);
+		
+		Date startAppointment = DATEFORMAT.parse("20170531110000+0100");
+		Date endAppointment = DATEFORMAT.parse("20170531120000+0100");
+		
+		// change the time of the appointmentDocument 
+		appointmentDocument.setDocumentationTimeInterval(startAppointment, endAppointment);
+		DocumentMetadata metaData = createDocumentMetadata(appointmentDocument);
+		
 		String externalIdForNewDocument = generateUUID();
-		String documentId = appointmentXdsRequestService.createAndRegisterDocument(externalIdForNewDocument, appointmentXmlDocument, appointmentCdaMetadata);
+		
+		//use the builder to output XML for the modified appointment
+		String alteredXML = codec.encode(appointmentDocument);
+		
+		String documentId = appointmentXdsRequestService.createAndRegisterDocument(externalIdForNewDocument, alteredXML , metaData);
 		System.out.println("We registered a new appointment with documentId="+documentId);
 
 		// Search document for patient (we assume there is one more now)
@@ -90,19 +107,28 @@ public class Application implements CommandLineRunner {
 		
 		// Update the document with a new one
 		DocumentEntry toBeUpdated = appointmentXdsRequestService.getAppointmentDocumentEntry(documentId);		
-		String updatedAppointmentXmlDocument = getXmlFileContent("/DK-APD_Example_1_newTimeAndPlace.xml");
 		
-		String startUpdated = "20170531120000+0100";
-		String endUpdated = "20170531130000+0100";
-		DocumentMetadata updatedAppointmentCdaMetadata = createDocumentMetadata(startUpdated, endUpdated);
+		// Use the parser to parse the response from the Xds into an appointmentDocument
+		appointmentDocument = codec.decode(document);
+				
+		Date startUpdated = DATEFORMAT.parse("20170531120000+0100");
+		Date endUpdated = DATEFORMAT.parse("20170531130000+0100");
+		
+		//We perform updates to the appointmentDocument - new time and new indication
+		appointmentDocument.setDocumentationTimeInterval(startUpdated,endUpdated);
+		appointmentDocument.setIndicationDisplayName("Undersøgelse af fod");
+		
+		//use the builder to output XML for the modified appointment
+		alteredXML = codec.encode(appointmentDocument);
+		
+		DocumentMetadata updatedAppointmentCdaMetadata = createDocumentMetadata(appointmentDocument);
 		String externalIdForUpdatedDocument = generateUUID();
-		String newDocumentId = appointmentXdsRequestService.createAndRegisterDocumentAsReplacement(externalIdForUpdatedDocument, updatedAppointmentXmlDocument, updatedAppointmentCdaMetadata, toBeUpdated.getEntryUuid());
+		String newDocumentId = appointmentXdsRequestService.createAndRegisterDocumentAsReplacement(externalIdForUpdatedDocument, alteredXML, updatedAppointmentCdaMetadata, toBeUpdated.getEntryUuid());
 		
 		List<DocumentEntry> currentAppointmentsAfterUpdatedAppointment = appointmentXdsRequestService.getAllAppointmentsForPatient(PATIENT_ID);
 		boolean couldFindOld = isDocumentIdInList(documentId, currentAppointmentsAfterUpdatedAppointment);
 		boolean couldFindNew = isDocumentIdInList(newDocumentId, currentAppointmentsAfterUpdatedAppointment);
 		System.out.println("The patient with id="+PATIENT_ID+" now has "+currentAppointmentsAfterUpdatedAppointment.size()+" registered in the XDS registry after update. The old DocumentId:"+documentId+" "+(couldFindOld ? "COULD BUT SHOULDN'T" : "fortunately could not")+" be found in search. The new DocumentId:"+newDocumentId+" "+(couldFindNew ? "could" : "COULDN'T BUT SHOULD")+" be found.");
-		
 		
 		// Now we want to deprecate a document...but first we have to get the document entry from the registry
 		DocumentEntry toBeDeprecated = appointmentXdsRequestService.getAppointmentDocumentEntry(newDocumentId);		
@@ -114,13 +140,13 @@ public class Application implements CommandLineRunner {
 		System.out.println("The patient with id="+PATIENT_ID+" now has "+currentAppointmentsAfterDeprecation.size()+" registered in the XDS registry after deprecate.");
 
 	}
-	
-	public DocumentMetadata createDocumentMetadata(String startTime, String endTime) throws ParseException {
+		
+	public DocumentMetadata createDocumentMetadata(AppointmentDocument apd) throws ParseException {
 		DocumentMetadata appointmentCdaMetadata = new DocumentMetadata();
-		appointmentCdaMetadata.setTitle("Aftale for "+PATIENT_ID);
-		appointmentCdaMetadata.setPatientId(new Code(PATIENT_ID, null, Codes.DK_CPR_OID));
-		appointmentCdaMetadata.setReportTime(DATEFORMAT.parse("20170113100000+0100"));
-		appointmentCdaMetadata.setOrganisation(new Code("242621000016001", new LocalizedString("OUH Radiologisk Afdeling (Svendborg)"), Codes.DK_SOR_CLASSIFICAION_OID));
+		appointmentCdaMetadata.setTitle(apd.getTitle());
+		appointmentCdaMetadata.setPatientId(new Code(apd.getPatient().getId().getExtension(), new LocalizedString(apd.getPatient().getId().getAuthorityName()), apd.getPatient().getId().getRoot()));
+		appointmentCdaMetadata.setReportTime(apd.getAuthor().getTime());
+		appointmentCdaMetadata.setOrganisation(new Code(apd.getAuthor().getId().getExtension(), new LocalizedString(apd.getAuthor().getOrganizationIdentity().getOrgName()), Codes.DK_SOR_CLASSIFICAION_OID));
 		appointmentCdaMetadata.setClassCode(new Code("001", new LocalizedString("Klinisk rapport"), "1.2.208.184.100.9"));
 		appointmentCdaMetadata.setFormatCode(new Code("urn:ad:dk:medcom:appointment", new LocalizedString("DK CDA APD") ,"1.2.208.184.14.1"));
 		appointmentCdaMetadata.setHealthcareFacilityTypeCode(new Code("22232009", new LocalizedString("hospital") ,"2.16.840.1.113883.6.96"));
@@ -128,11 +154,10 @@ public class Application implements CommandLineRunner {
 		appointmentCdaMetadata.setSubmissionTime(new Date());
 		appointmentCdaMetadata.setContentTypeCode(AppointmentConstants.APPOINTMENT_CODE);
 		appointmentCdaMetadata.setTypeCode(AppointmentConstants.APPOINTMENT_CODE);
-		appointmentCdaMetadata.setServiceStartTime(DATEFORMAT.parse(startTime));
-		appointmentCdaMetadata.setServiceStopTime(DATEFORMAT.parse(endTime));
+		appointmentCdaMetadata.setServiceStartTime(apd.getServiceStartTime());
+		appointmentCdaMetadata.setServiceStopTime(apd.getServiceStopTime());
 		return appointmentCdaMetadata;
 	}
-	
 
 	public String getXmlFileContent(String resource) throws SAXException, IOException, ParserConfigurationException, TransformerException {
 		InputStream is = Application.class.getResourceAsStream(resource);
