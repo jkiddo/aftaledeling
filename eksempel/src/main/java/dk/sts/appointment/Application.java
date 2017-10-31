@@ -64,8 +64,6 @@ public class Application implements CommandLineRunner {
 	}	
 
 	public void run(String... args) throws Exception {
-		
-		
 
 		// Search documents for patient
 		List<DocumentEntry> currentAppointments = appointmentXdsRequestService.getAllAppointmentsForPatient(PATIENT_ID);

@@ -21,9 +21,7 @@ import org.openehealth.ipf.commons.ihe.xds.iti57.Iti57PortType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Scope;
 
 import dk.sts.appointment.services.AppointmentXdsRequestBuilderService;
 import dk.sts.appointment.services.AppointmentXdsRequestService;
@@ -78,7 +76,6 @@ public class ApplicationConfiguration {
 	}
 
 	@Bean
-	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public Iti18PortType getDocumentRegistryServiceIti18() {
 		LOGGER.info("Creating Iti18PortType for url: "+xdsIti18Endpoint);
 
@@ -103,7 +100,6 @@ public class ApplicationConfiguration {
 	}
 
 	@Bean
-	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public Iti43PortType getDocumentRepositoryServiceIti43() {
 		LOGGER.info("Creating Iti43PortType for url: "+xdsIti43Endpoint);
 
@@ -116,7 +112,6 @@ public class ApplicationConfiguration {
 	}
 
 	@Bean
-	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public Iti57PortType getDocumentRepositoryServiceIti57() {
 		LOGGER.info("Creating Iti57PortType for url: "+xdsIti57Endpoint);
 

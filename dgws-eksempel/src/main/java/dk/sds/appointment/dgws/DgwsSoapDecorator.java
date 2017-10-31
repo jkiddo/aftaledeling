@@ -1,7 +1,6 @@
 package dk.sds.appointment.dgws;
 
 import java.io.IOException;
-import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -52,7 +51,7 @@ public class DgwsSoapDecorator extends AbstractSoapInterceptor {
 	public DgwsSoapDecorator() {
 		super(Phase.PRE_STREAM);
 	}
-	
+
 	@Override
 	public void handleMessage(SoapMessage message) throws Fault {
 		try {
@@ -61,28 +60,16 @@ public class DgwsSoapDecorator extends AbstractSoapInterceptor {
 
 			// Add the DGWS headers
 			Document sosi = getSosiDocument();
-			Node sosiElement = sosi.getDocumentElement().getFirstChild();
-			QName qname = new QName(sosiElement.getNamespaceURI(), sosiElement.getLocalName());
-			Header sosiHeader = new Header(qname, sosiElement.getFirstChild());
-			message.getHeaders().add(sosiHeader);
-
+			NodeList children = sosi.getDocumentElement().getFirstChild().getChildNodes();
+			for (int i = 0; i < children.getLength(); i++) {
+				Node element = children.item(i);
+				QName qname = new QName(element.getNamespaceURI(), element.getLocalName());
+				Header dgwsHeader = new Header(qname, element);
+				message.getHeaders().add(dgwsHeader);
+			}
+			
 		} catch (IOException e) {
 			throw new Fault(e);
-		}
-	}
-
-
-	public static void collectNameSpaces(Node root, Map<String, String> nsMap){
-		String prefix = root.getPrefix();
-		String ns = root.getNamespaceURI();
-		if (prefix != null) {
-			nsMap.put(prefix, ns);
-		}
-		NodeList nl = root.getChildNodes();
-		if (nl != null) {
-			for (int i = 0; i < nl.getLength(); i++) {
-				collectNameSpaces(nl.item(i), nsMap);
-			}
 		}
 	}
 

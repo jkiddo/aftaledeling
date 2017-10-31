@@ -22,6 +22,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.web.client.RestTemplate;
 
 import dk.sds.appointment.dgws.DgwsSoapDecorator;
+import dk.sds.appointment.dgws.HsuidSoapDecorator;
 import dk.sds.appointment.dgws.STSRequestHelper;
 import dk.sosi.seal.SOSIFactory;
 import dk.sosi.seal.pki.SOSITestFederation;
@@ -51,7 +52,8 @@ public class DgwsConfiguration {
 	public void init() {
 		// The SOSI Seal Library reads the alias value using System.getProperty()
 		System.setProperty("dk.sosi.seal.vault.CredentialVault#Alias", keystoreAlias);
-		DgwsSoapDecorator dgwsSoapDecorator = appContext.getBean(DgwsSoapDecorator.class);
+		DgwsSoapDecorator dgwsSoapDecorator = appContext.getBean("dgwsSoapDecorator", DgwsSoapDecorator.class);
+		HsuidSoapDecorator hsuidSoapDecorator = appContext.getBean(HsuidSoapDecorator.class);
 
 		// Add DGWS decorator to all ITI beans
 		Iti41PortType iti41 = appContext.getBean(Iti41PortType.class);
@@ -60,17 +62,22 @@ public class DgwsConfiguration {
 		
 		Iti43PortType iti43 = appContext.getBean(Iti43PortType.class);
 		Client proxy43 = ClientProxy.getClient(iti43);
-		proxy43.getOutInterceptors().add(dgwsSoapDecorator);
+		proxy43.getOutInterceptors().add(hsuidSoapDecorator);
 
 		Iti18PortType iti18 = appContext.getBean(Iti18PortType.class);
 		Client proxy18 = ClientProxy.getClient(iti18);
-		proxy18.getOutInterceptors().add(dgwsSoapDecorator);
+		proxy18.getOutInterceptors().add(hsuidSoapDecorator);
 
 		Iti57PortType iti57 = appContext.getBean(Iti57PortType.class);
 		Client proxy57 = ClientProxy.getClient(iti57);
-		proxy57.getOutInterceptors().add(dgwsSoapDecorator);
+		proxy57.getOutInterceptors().add(hsuidSoapDecorator);
 	}
 
+	@Bean
+	public HsuidSoapDecorator hsuidSoapDecorator() {
+		return new HsuidSoapDecorator();
+	}
+	
 	@Bean
 	public DgwsSoapDecorator dgwsSoapDecorator() {
 		return new DgwsSoapDecorator();
@@ -78,11 +85,7 @@ public class DgwsConfiguration {
 
 	@Bean
 	public CredentialVault getVault() throws CredentialVaultException, IOException {
-		// Design choice: The keystore should be external to the application, and the following code
-		//                requires that the keystore resides in a config folder relative to where
-		//                the application is started
 		Resource resource = resourceLoader.getResource("classpath:" + keystoreFilename);
-
 		return new FileBasedCredentialVault(new Properties(), resource.getFile(), keystorePassword);
 	}
 
