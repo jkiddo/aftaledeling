@@ -30,6 +30,7 @@ import dk.nsi.hsuid.SystemVersionAttribute;
 import dk.nsi.hsuid.UserTypeAttribute;
 import dk.nsi.hsuid._2016._08.hsuid_1_1.HsuidHeader;
 import dk.nsi.hsuid._2016._08.hsuid_1_1.SubjectIdentifierType;
+import dk.sts.appointment.Application;
 
 public class HsuidSoapDecorator extends DgwsSoapDecorator {
 
@@ -50,7 +51,7 @@ public class HsuidSoapDecorator extends DgwsSoapDecorator {
 
 	private Header getHsuid(String isCitizen, String userCivilRegistrationNumber, String systemOwner, String systemName, String systemVersion, String responsibleOrg, String issuer) throws JAXBException, ParserConfigurationException {
 		List<Attribute> attributes = new ArrayList<Attribute>();
-		attributes.add(new CitizenCivilRegistrationNumberAttribute("2512489996"));
+		attributes.add(new CitizenCivilRegistrationNumberAttribute(Application.PATIENT_ID));
 		attributes.add(new UserTypeAttribute(isCitizen));
 		attributes.add(new ActingUserCivilRegistrationNumberAttribute(userCivilRegistrationNumber));
 		attributes.add(new OrganisationIdentifierAttribute("293591000016003", SubjectIdentifierType.NSI_SORCODE.toString()));

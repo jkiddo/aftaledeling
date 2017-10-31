@@ -53,7 +53,7 @@ public class Application implements CommandLineRunner {
 	@Autowired
 	AppointmentXdsRequestService appointmentXdsRequestService;
 	
-	private static String PATIENT_ID = "2512489996";
+	public static String PATIENT_ID = "2512489996";
 	
 
 	public static void main(String[] args) throws Exception {
