@@ -35,6 +35,7 @@ import org.openehealth.ipf.commons.ihe.xds.core.requests.ProvideAndRegisterDocum
 import org.openehealth.ipf.commons.ihe.xds.core.requests.QueryRegistry;
 import org.openehealth.ipf.commons.ihe.xds.core.requests.query.FindDocumentsQuery;
 import org.openehealth.ipf.commons.ihe.xds.core.requests.query.GetDocumentsAndAssociationsQuery;
+import org.openehealth.ipf.commons.ihe.xds.core.requests.query.GetDocumentsQuery;
 import org.openehealth.ipf.commons.ihe.xds.core.requests.query.Query;
 import org.openehealth.ipf.commons.ihe.xds.core.requests.query.QueryReturnType;
 import org.openehealth.ipf.commons.ihe.xds.core.stub.ebrs30.lcm.SubmitObjectsRequest;
@@ -265,11 +266,13 @@ public class AppointmentXdsRequestBuilderService {
 	}
 	
 	public AdhocQueryRequest buildAdhocQueryRequest(String documentId, QueryReturnType qrt) {
-		GetDocumentsAndAssociationsQuery getQuery = new GetDocumentsAndAssociationsQuery();
 		List<String> uniqueIds = new LinkedList<String>();
 		uniqueIds.add(documentId);
-		getQuery.setUniqueIds(uniqueIds);
-		return createAdhocQueryRequest(getQuery, qrt);
+
+		GetDocumentsQuery gdq = new GetDocumentsQuery();
+		gdq.setUniqueIds(uniqueIds);
+		
+		return createAdhocQueryRequest(gdq, qrt);
 	}
 	
 
