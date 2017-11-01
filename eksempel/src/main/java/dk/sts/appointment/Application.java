@@ -32,12 +32,13 @@ import org.springframework.context.annotation.Import;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import dk.s4.hl7.cda.codes.MedCom;
+import dk.s4.hl7.cda.codes.NSI;
 import dk.s4.hl7.cda.convert.APDXmlCodec;
 import dk.s4.hl7.cda.model.apd.AppointmentDocument;
 import dk.sts.appointment.configuration.ApplicationConfiguration;
 import dk.sts.appointment.dto.DocumentMetadata;
 import dk.sts.appointment.services.AppointmentXdsRequestService;
-import dk.sts.appointment.utilities.Codes;
 
 
 @Import({ApplicationConfiguration.class})
@@ -144,9 +145,9 @@ public class Application implements CommandLineRunner {
 		appointmentCdaMetadata.setTitle(apd.getTitle());
 		appointmentCdaMetadata.setPatientId(new Code(apd.getPatient().getId().getExtension(), new LocalizedString(apd.getPatient().getId().getAuthorityName()), apd.getPatient().getId().getRoot()));
 		appointmentCdaMetadata.setReportTime(apd.getAuthor().getTime());
-		appointmentCdaMetadata.setOrganisation(new Code(apd.getAuthor().getId().getExtension(), new LocalizedString(apd.getAuthor().getOrganizationIdentity().getOrgName()), Codes.DK_SOR_CLASSIFICAION_OID));
+		appointmentCdaMetadata.setOrganisation(new Code(apd.getAuthor().getId().getExtension(), new LocalizedString(apd.getAuthor().getOrganizationIdentity().getOrgName()), NSI.SOR_OID));
 		appointmentCdaMetadata.setClassCode(new Code("001", new LocalizedString("Klinisk rapport"), "1.2.208.184.100.9"));
-		appointmentCdaMetadata.setFormatCode(new Code("urn:ad:dk:medcom:appointment", new LocalizedString("DK CDA APD") ,"1.2.208.184.14.1"));
+		appointmentCdaMetadata.setFormatCode(new Code("urn:ad:dk:medcom:appointment", new LocalizedString("DK CDA APD"), MedCom.DK_APD_ROOT_OID));
 		appointmentCdaMetadata.setHealthcareFacilityTypeCode(new Code("22232009", new LocalizedString("hospital") ,"2.16.840.1.113883.6.96"));
 		appointmentCdaMetadata.setPracticeSettingCode(new Code("408443003", new LocalizedString("almen medicin"),"2.16.840.1.113883.6.96"));
 		appointmentCdaMetadata.setSubmissionTime(new Date());

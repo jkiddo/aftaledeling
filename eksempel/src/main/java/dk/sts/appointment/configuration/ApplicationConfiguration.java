@@ -23,9 +23,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 
+import dk.s4.hl7.cda.codes.NSI;
 import dk.sts.appointment.services.AppointmentXdsRequestBuilderService;
 import dk.sts.appointment.services.AppointmentXdsRequestService;
-import dk.sts.appointment.utilities.Codes;
 import dk.sts.appointment.utilities.OrganisationIdAuthority;
 import dk.sts.appointment.utilities.PatientIdAuthority;
 
@@ -72,7 +72,7 @@ public class ApplicationConfiguration {
 
 	@Bean
 	public PatientIdAuthority getPatientIdAuthority() {
-		return new PatientIdAuthority(Codes.DK_CPR_OID);
+		return new PatientIdAuthority(NSI.CPR_OID);
 	}
 
 	@Bean
@@ -172,7 +172,7 @@ public class ApplicationConfiguration {
 
 	@Bean
 	public OrganisationIdAuthority organisationIdAuthority() {
-		return new OrganisationIdAuthority(Codes.DK_SOR_CLASSIFICAION_OID);
+		return new OrganisationIdAuthority(NSI.SOR_OID);
 	}
 
 	@Bean
